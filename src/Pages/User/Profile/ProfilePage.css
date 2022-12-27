@@ -1,0 +1,15 @@
+.Main{
+    position: relative;
+    display: grid;
+    /* grid-template-columns: 19rem auto 20rem; */
+    grid-template-columns: 15rem auto 21rem;
+    gap: 1rem;
+}
+.profileSide{
+    /* margin-top: 10px; */
+    height: 100vh;
+}
+.leftSide{
+    display: flex;
+    justify-content: center;
+}
