@@ -1,12 +1,8 @@
-import { Fragment, useEffect } from "react";
+import { Fragment } from "react";
 import {
-  RouterProvider,
-  createBrowserRouter,
   BrowserRouter as Router,
   Routes,
   Route,
-  Outlet,
-  Navigate,
 } from "react-router-dom";
 import "./App.css";
 import AdminLogin from "./Pages/Admin/AdminLogin";
@@ -19,60 +15,12 @@ import AdminProtectedRoute from "./Components/Admin/AdminAuth/AdminProtectedRout
 import UserProtectedRoute from "./Components/User/UserAuth/UserProtectedRoute";
 import AdminPublicRoute from "./Components/Admin/AdminAuth/AdminPublicRoute";
 import UserPublicRoute from "./Components/User/UserAuth/UserPublicRoute";
-import FindPeople from './Pages/User/FindPeople/FindPeople'
 import { Box } from "@mui/material";
 import ProfilePage from "./Pages/User/Profile/ProfilePage";
+import Messaging from "./Pages/User/Messaging/Messaging";
+import Chat from "./Pages/User/Chat/Chat";
 
 function App() {
-  
-  // const currentUser = false;
-
-  // const Layout = () => {
-  //   return (
-  //     <div>
-  //       <Navbar />
-  //       <div style={{ display: "flex" }}>
-  //         <Leftbar />
-  //         <Outlet />
-  //         <Rightbar />
-  //       </div>
-  //     </div>
-  //   );
-  // };
-  // const ProtectedRoute = ({ children }) => {
-  //   if (!currentUser) {
-  //     return <Navigate to="/login" />;
-  //   }
-  //   return children;
-  // };
-  // const router = createBrowserRouter([
-  //   {
-  //     path: "/",
-  //     element: (
-  //       <ProtectedRoute>
-  //         <Layout />
-  //       </ProtectedRoute>
-  //     ),
-  //     children: [
-  //       {
-  //         path: "/",
-  //         element: <Home />,
-  //       },
-  //       {
-  //         path: "/profile/:id",
-  //         element: <Profile />,
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     path: "/login",
-  //     element: <Login />,
-  //   },
-  //   {
-  //     path: "/signup",
-  //     element: <Signup />,
-  //   },
-  // ]);
   return (
     <Fragment>
       <Box className="App">
@@ -93,6 +41,14 @@ function App() {
               element={
                 <UserProtectedRoute>
                   <ProfilePage />
+                </UserProtectedRoute>
+              }
+            />
+            <Route
+              path="/messaging"
+              element={
+                <UserProtectedRoute>
+                  <Chat />
                 </UserProtectedRoute>
               }
             />

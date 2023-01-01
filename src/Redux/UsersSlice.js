@@ -1,10 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-
+const initialState = {users:[]}
 const usersSlice = createSlice({
   name: "users",
-  initialState: { 
-    users:[]
-   },
+  initialState,
   reducers: {
     followers: (state, action) => {
       state.users = action.payload.users;
@@ -22,11 +20,9 @@ const usersSlice = createSlice({
     followed:(state,action)=>{
         state.users = state.users.filter(val=>val._id!==action.payload.users)
     },
-    nullUsers:(state,action)=>{
-      state.users = null
-    }
+    resetUsers:()=>initialState
   },
 });
 
-export const {followers,following,others,followed,unfollowed,nullUsers } = usersSlice.actions;
+export const {followers,following,others,followed,unfollowed,resetUsers } = usersSlice.actions;
 export default usersSlice.reducer;

@@ -28,7 +28,7 @@ const PostShare = ({ getPosts }) => {
   }, []);
 
   const getUser = async () => {
-    await axios.get("/api/user/get-user-info-by-id").then((response) => {
+    await axios.get("/user/get-user-info-by-id").then((response) => {
       // console.log('USERIS HERE',response.data.data);
       dispatch(user({ user: response.data.data }));
     });
@@ -62,7 +62,7 @@ const PostShare = ({ getPosts }) => {
       }
     }
     await axios
-      .post("/api/user/upload-post", { postData, image })
+      .post("/user/upload-post", { postData, image })
       .then((response) => {
         toast("Post uploaded", {
           // icon: "✔",
@@ -101,7 +101,7 @@ const PostShare = ({ getPosts }) => {
       className="postShare"
       style={{ display: "flex", alignItems: "center" }}
     >
-      {userInfo.profilePic ? (
+      {userInfo.profilePic &&
         <div
           style={{
             backgroundImage: `url(${userInfo.profilePic})`,
@@ -111,10 +111,10 @@ const PostShare = ({ getPosts }) => {
             backgroundSize: "cover",
             borderRadius: "50%",
           }}
-        ></div>
-      ) : (
-        <img src={DefaultProfile} alt="" />
-      )}
+        ></div>}
+      {/* // ) : (
+      //   <img src={DefaultProfile} alt="" />
+      // )} */}
       <div>
         <div
           style={{

@@ -46,7 +46,7 @@ function LoginAdmin() {
     onSubmit: (values) => {
       try {
         axios({
-          url: "/api/admin/login",
+          url: "/admin/login",
           method: "post",
           data: values,
         })

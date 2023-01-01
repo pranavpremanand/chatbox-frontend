@@ -146,7 +146,7 @@ function Profile() {
   //Get user posts
   const getPosts = () => {
     axios
-      .get("/api/user/get-user-posts")
+      .get("/user/get-user-posts")
       .then((response) => {
         if (response.data.success) {
           // console.log(response.data.posts,"PSOTS")
@@ -163,7 +163,7 @@ function Profile() {
   //Get user photos
   const getUserPhotos = () => {
     axios
-      .get("/api/user/get-user-photos")
+      .get("/user/get-user-photos")
       .then((response) => {
         if (response.data.success) {
           dispatch(photos({ photos: response.data.photos }));
@@ -184,11 +184,11 @@ function Profile() {
     setEditOption(false);
     console.log(profileDetails);
     axios
-      .post("/api/user/update-profile", profileDetails)
+      .post("/user/update-profile", profileDetails)
       .then((response) => {
         if (response.data.success) {
           axios
-            .get("/api/user/get-user-posts")
+            .get("/user/get-user-posts")
             .then((response) => {
               if (response.data.success) {
                 setPosts(response.data.posts);

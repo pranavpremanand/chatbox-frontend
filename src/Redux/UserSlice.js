@@ -1,16 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const initialState= { user: {} }
 const userSlice = createSlice({
   name: "user",
-  initialState: { user: {} },
+  initialState,
   reducers: {
     user: (state, action) => {
         // console.log('action.payload.user',action.payload.user)
       state.user = action.payload.user;
     },
-    nullUser:(state,action)=>{
-      state.user = action.payload.user;
-    }
+    resetUser:()=>initialState
     // addCoverPic:(state,action)=>{
     //   console.log('USERSDATA',state)
     //   state.user.coverPic = action.payload.user
@@ -18,5 +17,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { user,nullUser } = userSlice.actions;
+export const { user,resetUser } = userSlice.actions;
 export default userSlice.reducer;

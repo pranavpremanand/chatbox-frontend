@@ -22,7 +22,7 @@ function Home() {
 
   const getPosts = async () => {
   try{
-    await axios.get("/api/user/posts").then((response) => {
+    await axios.get("/user/posts").then((response) => {
         const data = response.data.posts;
         dispatch(
           allPosts({
@@ -47,7 +47,7 @@ function Home() {
   const [posts,setPosts]=useState([])
   const getData = async () => {
     try {
-        axios.get('/api/user/posts').then((response)=>{
+        axios.get('/user/posts').then((response)=>{
           const data = response.data.posts
           setPosts({data})
         })

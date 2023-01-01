@@ -3,8 +3,7 @@ import "./Post.css";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
-import ShareIcon from "@mui/icons-material/Share";
-import { red, teal } from "@mui/material/colors";
+import { red } from "@mui/material/colors";
 import {
   Avatar,
   Box,
@@ -23,11 +22,18 @@ import { useState } from "react";
 import axios from "../../../../../APIs/axios";
 import { toast } from "react-hot-toast";
 import { postDelete } from "../../../../../Redux/PostSlice";
-import { allComments, nullComments } from "../../../../../Redux/CommentsSlice";
+import { allComments } from "../../../../../Redux/CommentsSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { format } from "timeago.js";
+import TimeAgo from 'javascript-time-ago'
+// import { format } from "timeago.js";
+
+// English.
+import en from 'javascript-time-ago/locale/en'
+
+TimeAgo.addDefaultLocale(en)
 
 const Post = ({ data, liked, getPosts }) => {
+  const timeAgo = new TimeAgo('en-US')
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const currentUser = useSelector((state) => state.user.user._id);
@@ -50,7 +56,7 @@ const Post = ({ data, liked, getPosts }) => {
   // Delete post
   const deletePost = (id) => {
     axios
-      .get(`/api/user/delete-post/${id}`)
+      .get(`/user/delete-post/${id}`)
       .then((response) => {
         if (response.data.success) {
           getPosts();
@@ -90,7 +96,7 @@ const Post = ({ data, liked, getPosts }) => {
 
   const likePost = (postId) => {
     axios
-      .get("/api/user/like-post/" + postId)
+      .get("/user/like-post/" + postId)
       .then((response) => {
         if (response.data.success) {
           setLike(like ? false : true);
@@ -110,7 +116,7 @@ const Post = ({ data, liked, getPosts }) => {
 
   const submitComment = (postId) => {
     axios
-      .post("/api/user/add-comment/" + postId, { comment: commentInput })
+      .post("/user/add-comment/" + postId, { comment: commentInput })
       .then((response) => {
         if (response.data.success) {
           setCommentInput("");
@@ -131,7 +137,7 @@ const Post = ({ data, liked, getPosts }) => {
   const getComments = (postId) => {
     console.log("HELLLLLLLLLLL");
     axios
-      .get("/api/user/get-comments/" + postId)
+      .get("/user/get-comments/" + postId)
       .then((response) => {
         if (response.data.success) {
           if (response.data.comments.userId === currentUser) {
@@ -155,7 +161,7 @@ const Post = ({ data, liked, getPosts }) => {
   const deleteComment = (commentId, postId) => {
     try {
       axios
-        .get(`/api/user/delete-comment/${commentId}/${postId}`)
+        .get(`/user/delete-comment/${commentId}/${postId}`)
         .then((response) => {
           if (response.data.success) {
             getComments(postId);
@@ -229,7 +235,8 @@ const Post = ({ data, liked, getPosts }) => {
                   <b>{data.fullName}</b>
                 </Typography>
                 <Typography>{"@" + data.username}</Typography>
-                <Typography sx={{fontSize:'12px'}}>{format(data.posts.createdAt)}</Typography>
+                {/* <Typography sx={{fontSize:'12px'}}>{format(data.posts.createdAt)}</Typography> */}
+                <Typography sx={{fontSize:'12px'}}>{timeAgo.format(new Date( data.posts.createdAt))}</Typography>
               </Box>
             </Box>
 
@@ -290,12 +297,14 @@ const Post = ({ data, liked, getPosts }) => {
             transformOrigin={{ horizontal: "right", vertical: "top" }}
             anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
-            <MenuItem
-              onClick={() => deletePost(data.posts._id)}
+            {currentUser === data._id &&
+              <MenuItem
+              onClick={() => deletePost(data.posts._id)} 
               sx={{ display: "flex", justifyContent: "space-between" }}
-            >
+              >
               <DeleteIcon sx={{ mr: 5 }} /> <Typography>Delete</Typography>
             </MenuItem>
+            }
 
             <Divider />
             {dotOptions.save ? (
@@ -352,7 +361,14 @@ const Post = ({ data, liked, getPosts }) => {
                 </Typography>
               </Box>
             )}
-            <CommentIcon onClick={() => openCommentBox(data.posts._id)} />
+            <Box
+                sx={{ display: "flex", gap: "0.3rem" }}
+              >
+                <CommentIcon onClick={() => openCommentBox(data.posts._id)} />
+                <Typography>
+                  {data.posts.comments.length === 0 ? null : data.posts.comments.length}
+                </Typography>
+              </Box>
             {/* <ShareIcon /> */}
           </div>
         </div>
@@ -451,7 +467,8 @@ const Post = ({ data, liked, getPosts }) => {
                         </Typography>
                       </Box>
                       <Typography sx={{ fontSize: "11px" }}>
-                        {format(val.date)}
+                        {/* {format(val.date)} */}
+                        {timeAgo.format(new Date( val.date))}
                       </Typography>
                     </Box>
                     <Box

@@ -98,7 +98,7 @@ export default function SignUp() {
         if (otp === "") {
           console.log(values);
           axios({
-            url: "/api/user/send-otp",
+            url: "/user/send-otp",
             method: "post",
             data: values,
           }).then((response) => {
@@ -137,7 +137,7 @@ export default function SignUp() {
           });
         } else if (otp === values.otp) {
           axios
-            .post("/api/user/signup", values)
+            .post("/user/signup", values)
             .then((response) => {
               if (response.data.message === "Account created successfully.") {
                 toast(response.data.message, {

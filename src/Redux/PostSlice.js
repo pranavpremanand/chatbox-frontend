@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const initialState = { posts: [] };
 const postSlice = createSlice({
   name: "posts",
-  initialState: { posts: [] },
+  initialState,
   reducers: {
     allPosts: (state, action) => {
       // console.log(action.payload.posts, " action.payload.posts");
@@ -30,9 +31,7 @@ const postSlice = createSlice({
     //   post.likedUsers = post.likedUsers.filter((val) => val !== 1);
     //   post.isLiked = false;
     // },
-    postsNull: (state, action) => {
-      state.posts = [];
-    },
+    resetPosts: () => initialState,
   },
 });
 
@@ -42,6 +41,6 @@ export const {
   unlikePost,
   postUpload,
   postDelete,
-  postsNull,
+  resetPosts,
 } = postSlice.actions;
 export default postSlice.reducer;

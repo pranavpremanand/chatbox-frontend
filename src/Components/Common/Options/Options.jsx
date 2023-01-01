@@ -8,7 +8,12 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
 import EmailIcon from "@mui/icons-material/Email";
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import { nullUser, user } from "../../../Redux/UserSlice";
+import { resetUser } from "../../../Redux/UserSlice";
+import { resetComments } from "../../../Redux/CommentsSlice";
+import { resetFollowingUsers } from "../../../Redux/FollowingUsers";
+import { resetOthers } from "../../../Redux/OtherUsers";
+import { resetPosts } from "../../../Redux/PostSlice";
+import { resetUsers } from "../../../Redux/UsersSlice";
 import { useDispatch } from "react-redux";
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
 
@@ -16,7 +21,12 @@ const Options = () => {
   const dispatch = useDispatch()
   const logOut = ()=>{
     localStorage.removeItem("userToken")
-    dispatch(user({user:null}))
+    dispatch(resetUser())
+    dispatch(resetComments())
+    dispatch(resetPosts())
+    dispatch(resetOthers())
+    dispatch(resetUsers())
+    dispatch(resetFollowingUsers())
     navigate("/login");
   }
 
@@ -57,7 +67,7 @@ const Options = () => {
         <Grid sx={{paddingBottom:'0.5rem'}}>
           <Button
             sx={{ fontSize: "medium", color: "black",gap:'0.5rem' }}
-            className="text-capitalize"
+            className="text-capitalize" onClick={()=>navigate('/messaging')}
           >
           <EmailIcon />
             Messaging

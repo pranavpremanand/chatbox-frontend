@@ -51,7 +51,7 @@ function Login() {
     onSubmit: (values) => {
       try {
         axios({
-          url: "/api/user/login",
+          url: "/user/login",
           method: "post",
           data: values,
         })

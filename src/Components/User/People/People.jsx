@@ -34,7 +34,7 @@ const People = () => {
   //Get following users
   const getFollowing = async () => {
     await axios
-      .get("/api/user/followings")
+      .get("/user/followings")
       .then((response) => {
         setFollowersTrue(false);
         dispatch(following({ users: response.data.users[0].result }));
@@ -58,7 +58,7 @@ const People = () => {
   //Get followers
   const getFollowers = async () => {
     await axios
-      .get("/api/user/followers")
+      .get("/user/followers")
       .then((response) => {
         setFollowersTrue(true);
         setFollowers(response.data.users[0].result);
@@ -82,7 +82,7 @@ const People = () => {
   //Get others
   const getWhoToFollow = () => {
     axios
-      .get("/api/user/who-to-follow")
+      .get("/user/who-to-follow")
       .then((response) => {
         if (response.data.success) {
           setFollowersTrue(false)
@@ -104,7 +104,7 @@ const People = () => {
   //Unfollow user
   const unfollow = async (id) => {
     await axios
-      .get("/api/user/unfollow-user/" + id)
+      .get("/user/unfollow-user/" + id)
       .then((response) => {
         if (response.data.success) {
           // getFollowing();
@@ -137,7 +137,7 @@ const People = () => {
 
   const follow = async (id) => {
     await axios
-      .get("/api/user/follow-user/" + id)
+      .get("/user/follow-user/" + id)
       .then((response) => {
         if (response.data.success) {
           // getFollowing();

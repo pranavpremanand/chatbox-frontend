@@ -18,7 +18,7 @@ const FollowersCard = () => {
 
   const follow = (userId) => {
     axios
-      .get(`/api/user/follow-user/${userId}`)
+      .get(`/user/follow-user/${userId}`)
       .then((response) => {
         if (response.data.success) {
           // followUser(userId)
@@ -45,7 +45,7 @@ const FollowersCard = () => {
 
   const getUsers = () => {
     axios
-      .get("/api/user/get-users")
+      .get("/user/get-users")
       .then((response) => {
         if (response.data.success) {
           console.log(response.data.data);
