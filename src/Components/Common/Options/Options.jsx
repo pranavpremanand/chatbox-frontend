@@ -1,55 +1,88 @@
-import { Box, Button, Container, Grid } from "@mui/material";
-import React from "react";
-import { Link, useNavigate,useHref } from "react-router-dom";
+import { Box, Button, Container, Grid, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useHref } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import Person2Icon from "@mui/icons-material/Person2";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
 import EmailIcon from "@mui/icons-material/Email";
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import { resetUser } from "../../../Redux/UserSlice";
 import { resetComments } from "../../../Redux/CommentsSlice";
+import {
+  setNotifications,
+  seenNotifications,
+} from "../../../Redux/NotificationsSlice";
 import { resetFollowingUsers } from "../../../Redux/FollowingUsers";
 import { resetOthers } from "../../../Redux/OtherUsers";
 import { resetPosts } from "../../../Redux/PostSlice";
 import { resetUsers } from "../../../Redux/UsersSlice";
-import { useDispatch } from "react-redux";
-import BookmarksIcon from '@mui/icons-material/Bookmarks';
+import { useDispatch, useSelector } from "react-redux";
+import BookmarksIcon from "@mui/icons-material/Bookmarks";
+import {
+  getNotifications,
+  seenAllNotifications,
+} from "../../../APIs/Notifications";
 
 const Options = () => {
-  const dispatch = useDispatch()
-  const logOut = ()=>{
-    localStorage.removeItem("userToken")
-    dispatch(resetUser())
-    dispatch(resetComments())
-    dispatch(resetPosts())
-    dispatch(resetOthers())
-    dispatch(resetUsers())
-    dispatch(resetFollowingUsers())
+  const dispatch = useDispatch();
+
+  const notifications = useSelector(
+    (state) => state.notifications.notifications
+  );
+  const logOut = () => {
+    localStorage.removeItem("userToken");
+    dispatch(resetUser());
+    dispatch(resetComments());
+    dispatch(resetPosts());
+    dispatch(resetOthers());
+    dispatch(resetUsers());
+    dispatch(resetFollowingUsers());
     navigate("/login");
-  }
+  };
+
+  useEffect(() => {
+    // const user = JSON.parse(localStorage.getItem('user'))
+    // console.log('user',user)
+    getNotificationsData();
+  },[]);
+  const getNotificationsData = async () => {
+    const { data } = await getNotifications();
+    console.log('Notifications',data)
+    dispatch(setNotifications({ notifications: data }));
+  };
+
+  const handleClickNotifications = async () => {
+    // const { data } = await seenAllNotifications();
+    // console.log('Notifications',data)
+    // dispatch(setNotifications({ notifications: data }));
+
+    navigate("/notifications");
+  };
 
   const navigate = useNavigate();
   return (
     <Container>
       <Box className="buttonsBox">
-        <Grid sx={{paddingBottom:'0.5rem'}}>
-          <Button onClick={()=>navigate('/')}
-            sx={{ fontSize: "medium", color: "black",gap:'0.5rem' }}
+        <Grid sx={{ paddingBottom: "0.5rem" }}>
+          <Button
+            onClick={() => navigate("/")}
+            sx={{ fontSize: "medium", color: "black", gap: "0.5rem" }}
             className="text-capitalize"
           >
-          <HomeIcon/>
+            <HomeIcon />
             Home
           </Button>
         </Grid>
 
-        <Grid sx={{paddingBottom:'0.5rem'}}>
+        <Grid sx={{ paddingBottom: "0.5rem" }}>
           <Button
-            sx={{ fontSize: "medium", color: "black",gap:'0.5rem' }}
-            className="text-capitalize" onClick={()=>navigate('/profile')}
+            sx={{ fontSize: "medium", color: "black", gap: "0.5rem" }}
+            className="text-capitalize"
+            onClick={() => navigate("/profile")}
           >
-          <Person2Icon />
+            <Person2Icon />
             Profile
           </Button>
         </Grid>
@@ -64,33 +97,44 @@ const Options = () => {
           </Button>
         </Grid> */}
 
-        <Grid sx={{paddingBottom:'0.5rem'}}>
+        <Grid sx={{ paddingBottom: "0.5rem" }}>
           <Button
-            sx={{ fontSize: "medium", color: "black",gap:'0.5rem' }}
-            className="text-capitalize" onClick={()=>navigate('/messaging')}
+            sx={{ fontSize: "medium", color: "black", gap: "0.5rem" }}
+            className="text-capitalize"
+            onClick={() => navigate("/messaging")}
           >
-          <EmailIcon />
+            <EmailIcon />
             Messaging
           </Button>
         </Grid>
 
-        <Grid sx={{paddingBottom:'0.5rem'}}>
+        <Grid sx={{ paddingBottom: "0.5rem" }}>
           <Button
-            sx={{ fontSize: "medium", color: "black",gap:'0.5rem' }}
+            sx={{ fontSize: "medium", color: "black", gap: "0.5rem" }}
             className="text-capitalize"
           >
-          <BookmarksIcon />
+            <BookmarksIcon />
             Saved Posts
           </Button>
         </Grid>
 
-        <Grid sx={{paddingBottom:'0.5rem'}}>
+        <Grid sx={{ paddingBottom: "0.5rem" }}>
           <Button
-            sx={{ fontSize: "medium", color: "black",gap:'0.5rem' }}
+            onClick={handleClickNotifications}
+            sx={{ fontSize: "medium", color: "black", gap: "0.5rem" }}
             className="text-capitalize"
           >
-          <NotificationsIcon />
+            <NotificationsIcon />
             Notifications
+            <Box
+              sx={{
+                backgroundColor: "lightblue",
+                borderRadius: "50%",
+                paddingX: "0.5rem",
+              }}
+            >
+              {notifications.length !== 0 && notifications.length}
+            </Box>
           </Button>
         </Grid>
 
@@ -104,11 +148,12 @@ const Options = () => {
           </Button>
         </Grid> */}
 
-        <Grid sx={{paddingBottom:'0.5rem'}}>
+        <Grid sx={{ paddingBottom: "0.5rem" }}>
           <Button
             className="text-capitalize"
-            sx={{ fontSize: "medium", color:'black',gap:'0.5rem' }}
-            onClick={() => {logOut()
+            sx={{ fontSize: "medium", color: "black", gap: "0.5rem" }}
+            onClick={() => {
+              logOut();
             }}
           >
             <LogoutIcon />

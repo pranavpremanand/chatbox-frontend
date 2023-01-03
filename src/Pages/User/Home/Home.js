@@ -13,10 +13,15 @@ import { allPosts } from "../../../Redux/PostSlice";
 // import useMediaQuery from '@mui/material/useMediaQuery';
 // import { createTheme, ThemeProvider } from '@mui/material/styles';
 function Home() {
+
+
+
   // const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const navigate = useNavigate();
   useEffect(() => {
+    // console.log('Mounting')
     getData();
+    // return console.log('Unmounting')
   }, []);
   const dispatch = useDispatch();
 
@@ -58,7 +63,7 @@ function Home() {
   return (
     // <ThemeProvider theme={theme}>
     <div className="Home">
-      <div className="profileSide">
+      <div className="LeftSide">
         <LeftSide />
       </div>
       <div className="postSide">

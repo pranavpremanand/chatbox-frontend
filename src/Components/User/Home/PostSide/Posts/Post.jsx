@@ -25,7 +25,6 @@ import { postDelete } from "../../../../../Redux/PostSlice";
 import { allComments } from "../../../../../Redux/CommentsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import TimeAgo from 'javascript-time-ago'
-// import { format } from "timeago.js";
 
 // English.
 import en from 'javascript-time-ago/locale/en'

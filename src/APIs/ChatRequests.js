@@ -1,2 +1,2 @@
-import axios from './axios'
-export const userChats =()=>axios.get('/user/chat/')
+import axios from "./axios";
+export const userChats = () => axios.get("/user/chat/");

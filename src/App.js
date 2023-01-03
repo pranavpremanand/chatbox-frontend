@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment,useRef } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -19,6 +19,10 @@ import { Box } from "@mui/material";
 import ProfilePage from "./Pages/User/Profile/ProfilePage";
 import Messaging from "./Pages/User/Messaging/Messaging";
 import Chat from "./Pages/User/Chat/Chat";
+import Notifications from "./Pages/User/Notifications/Notifications";
+// import { io } from "socket.io-client";
+//   const socket = {}
+//   socket.current = io("http://localhost:8800");
 
 function App() {
   return (
@@ -49,6 +53,14 @@ function App() {
               element={
                 <UserProtectedRoute>
                   <Chat />
+                </UserProtectedRoute>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <UserProtectedRoute>
+                  <Notifications />
                 </UserProtectedRoute>
               }
             />

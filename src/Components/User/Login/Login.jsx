@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import "../LoginSignup.css";
-import { useNavigate } from "react-router-dom";
+import { json, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import {
@@ -58,9 +58,9 @@ function Login() {
           .then((response) => {
             console.log(response.data);
             if (response.data.success) {
-              // console.log("USER",response.data.user)
               dispatch(user({user:response.data.user}))
               localStorage.setItem("userToken", response.data.accessToken);
+              localStorage.setItem("user", JSON.stringify(response.data.user));
               navigate("/");
             } else {
               toast(response.data.message, {

@@ -2,12 +2,13 @@ import { Avatar, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import axios from "../../../APIs/axios";
-const Conversation = ({ data, currentUserId }) => {
+const Conversation = ({online, data, currentUserId }) => {
   const [userData, setUserData] = useState(null);
   useEffect(() => {
     getUserData();
   }, []);
-  const userId = data.members.find((id) => id !== currentUserId);
+//   const userId = data.members.find((id) => id !== currentUserId);
+const userId=data._id
   // console.log(userId,'USERID')
   const getUserData = async () => {
     try {
@@ -28,7 +29,7 @@ const Conversation = ({ data, currentUserId }) => {
       <>
     <div className="follower conversation">
       <div>
-        <div className="online-dot"></div>
+        {online&&<div className="online-dot"></div>}
         {userData?.profilePic ? (
           // <img style={{}} src={userData.profilePic} alt="" />:
           <div
@@ -47,7 +48,7 @@ const Conversation = ({ data, currentUserId }) => {
         <Box sx={{fontSize:'0.8rem',display:'flex',justifyContent:'center',flexDirection:'column'}}>
             <Typography sx={{fontWeight:'bold',fontSize:'13px'}}>{userData?.fullName}</Typography>
             {/* <Typography sx={{fontSize:'13px'}}>{userData?.username}</Typography> */}
-            <Typography sx={{fontSize:'10px'}}>Online</Typography>
+            <Typography sx={{fontSize:'10px'}}>{online?'Online':'Offline'}</Typography>
         </Box>
       </div>
     </div>
