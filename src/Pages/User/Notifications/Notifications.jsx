@@ -6,25 +6,44 @@ import { seenAllNotifications } from "../../../APIs/Notifications";
 import LeftSide from "../../../Components/User/Home/LeftSide/LeftSide";
 import RightSide from "../../../Components/User/Home/RightSide/RightSide";
 import NotificationsList from "../../../Components/User/Notifications/NotificationsList";
-import { setNotifications,seenNotifications } from "../../../Redux/NotificationsSlice";
+import {
+  setNotifications,
+  seenNotifications,
+  resetNotifications,
+} from "../../../Redux/NotificationsSlice";
+import { user } from "../../../Redux/UserSlice";
 import "./Notifications.css";
+import axios from '../../../APIs/axios'
 
 const Notifications = () => {
-//   const [notifications, setNotificationsData] = useState([]);
   const dispatch = useDispatch();
-  const notifications = useSelector((state)=>state.notifications.seen)
+  let currentUser = JSON.parse(localStorage.getItem('user'))
+  currentUser = currentUser._id
+  // const notifications = useSelector((state) => state.notifications.seen);
+  const [data,setData]=useState([])
   useEffect(() => {
     getNotificationsData();
   }, []);
   const getNotificationsData = async () => {
     try {
-      await seenAllNotifications().then((response) => {
-        const { data } = response;
-        console.log("Notifications", data);
-        // setNotificationsData(data);
-        dispatch(seenNotifications({notifications:data}))
-        dispatch(setNotifications({ notifications: [] }));
-      });
+     const response = await axios.get("/user/seen-notifications");
+    //  seenAllNotifications()
+    console.log(response.data,'response')
+    //  dispatch(user({ user: response.data }));
+    //  localStorage.setItem('user',JSON.stringify(response.data))
+    //  setData(response.data.seenNotifications )
+      // .then((response) => {
+      //   console.log("nnnnnnn")
+      //   const { data } = response;
+      //   dispatch(user({ user: data }));
+      //   localStorage.setItem('user',JSON.stringify(data))
+      //   console.log("seen",data.seenNotifications)
+      //   setData(data.seenNotifications )
+      //   dispatch(
+      //     seenNotifications({ notifications: data.seenNotifications })
+      //   );
+      //   dispatch(resetNotifications({ notifications: [] }));
+      // }).catch(err=>console.log("err",err))
     } catch (err) {
       console.log(err);
     }
@@ -44,7 +63,7 @@ const Notifications = () => {
               Notifications
             </Typography>
           </Box>
-          {notifications[0] ? (
+          {data[0] ? (
             <Box sx={{ display: "flex", justifyContent: "center" }}>
               <List
                 sx={{
@@ -54,8 +73,12 @@ const Notifications = () => {
                   borderRadius: "10px",
                 }}
               >
-                {notifications.map((notification) => {
-                  return <NotificationsList data={notification} />;
+                {data.map((notification) => {
+                  return (
+                    currentUser !== notification.userId._id && (
+                      <NotificationsList data={notification} />
+                    )
+                  );
                 })}
               </List>
             </Box>
@@ -66,7 +89,7 @@ const Notifications = () => {
                   width: "100%",
                   maxWidth: 800,
                   bgcolor: "background.paper",
-                  borderRadius: "10px", 
+                  borderRadius: "10px",
                 }}
               >
                 <Typography

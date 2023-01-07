@@ -21,18 +21,23 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { useState } from "react";
 import axios from "../../../../../APIs/axios";
 import { toast } from "react-hot-toast";
-import { postDelete } from "../../../../../Redux/PostSlice";
+import {
+  postDelete,
+  likePost,
+  unlikePost,
+  allPosts,
+} from "../../../../../Redux/PostSlice";
 import { allComments } from "../../../../../Redux/CommentsSlice";
 import { useDispatch, useSelector } from "react-redux";
-import TimeAgo from 'javascript-time-ago'
+import TimeAgo from "javascript-time-ago";
 
 // English.
-import en from 'javascript-time-ago/locale/en'
+import en from "javascript-time-ago/locale/en";
 
-TimeAgo.addDefaultLocale(en)
+TimeAgo.addDefaultLocale(en);
 
 const Post = ({ data, liked, getPosts }) => {
-  const timeAgo = new TimeAgo('en-US')
+  const timeAgo = new TimeAgo("en-US");
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const currentUser = useSelector((state) => state.user.user._id);
@@ -40,8 +45,6 @@ const Post = ({ data, liked, getPosts }) => {
 
   const [commentBox, setCommentBox] = useState(false);
   const [commentInput, setCommentInput] = useState("");
-  const [like, setLike] = useState(liked);
-  const [likeCount, setLikeCount] = useState(data.posts.likedUsers.length);
   const [commentsDeleter, setCommentsDeleter] = useState(false);
 
   const open = Boolean(anchorEl);
@@ -61,7 +64,6 @@ const Post = ({ data, liked, getPosts }) => {
           getPosts();
           dispatch(postDelete({ posts: id }));
           toast(response.data.message, {
-            // icon: "✔",
             icon: "✅",
             style: {
               borderRadius: "10px",
@@ -93,18 +95,20 @@ const Post = ({ data, liked, getPosts }) => {
       });
   };
 
-  const likePost = (postId) => {
+  const like = (postId) => {
     axios
       .get("/user/like-post/" + postId)
       .then((response) => {
         if (response.data.success) {
-          setLike(like ? false : true);
+          getPosts();
           if (response.data.liked) {
-            setLikeCount(likeCount + 1);
-            // dispatch(reduxLike(postId));
+            dispatch(likePost({ postId: postId, userId: currentUser }));
+            data.posts.likedUsers.length++;
+            // setLikeCount(likeCount + 1);
           } else if (response.data.unliked) {
-            setLikeCount(likeCount - 1);
-            // dispatch(reduxUnlike(postId));
+            data.posts.likedUsers.length--;
+            dispatch(unlikePost({ postId: postId, userId: currentUser }));
+            // setLikeCount(likeCount - 1);
           }
         }
       })
@@ -134,7 +138,6 @@ const Post = ({ data, liked, getPosts }) => {
   };
 
   const getComments = (postId) => {
-    console.log("HELLLLLLLLLLL");
     axios
       .get("/user/get-comments/" + postId)
       .then((response) => {
@@ -145,7 +148,7 @@ const Post = ({ data, liked, getPosts }) => {
             setCommentsDeleter(false);
           }
           const commentsDetails = response.data.comments.comments;
-          console.log(commentsDetails, "COMMENTSDATA");
+          console.log(commentsDetails, "comments");
           // dispatch(nullComments())
           dispatch(allComments({ comments: commentsDetails }));
           // setComments(response.data.comments.comments);
@@ -164,6 +167,7 @@ const Post = ({ data, liked, getPosts }) => {
         .then((response) => {
           if (response.data.success) {
             getComments(postId);
+            getPosts()
           }
         })
         .catch((err) => {
@@ -234,8 +238,9 @@ const Post = ({ data, liked, getPosts }) => {
                   <b>{data.fullName}</b>
                 </Typography>
                 <Typography>{"@" + data.username}</Typography>
-                {/* <Typography sx={{fontSize:'12px'}}>{format(data.posts.createdAt)}</Typography> */}
-                <Typography sx={{fontSize:'12px'}}>{timeAgo.format(new Date( data.posts.createdAt))}</Typography>
+                <Typography sx={{ fontSize: "12px" }}>
+                  {timeAgo.format(new Date(data.posts.createdAt))}
+                </Typography>
               </Box>
             </Box>
 
@@ -296,14 +301,14 @@ const Post = ({ data, liked, getPosts }) => {
             transformOrigin={{ horizontal: "right", vertical: "top" }}
             anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
-            {currentUser === data._id &&
+            {currentUser === data._id && (
               <MenuItem
-              onClick={() => deletePost(data.posts._id)} 
-              sx={{ display: "flex", justifyContent: "space-between" }}
+                onClick={() => deletePost(data.posts._id)}
+                sx={{ display: "flex", justifyContent: "space-between" }}
               >
-              <DeleteIcon sx={{ mr: 5 }} /> <Typography>Delete</Typography>
-            </MenuItem>
-            }
+                <DeleteIcon sx={{ mr: 5 }} /> <Typography>Delete</Typography>
+              </MenuItem>
+            )}
 
             <Divider />
             {dotOptions.save ? (
@@ -330,44 +335,48 @@ const Post = ({ data, liked, getPosts }) => {
             </Typography>
           </Box>
         </div>
-        <img src={data.posts.image} width="" alt="" />
+        <img src={data.posts.image} style={{maxHeight:'450px'}} width="" alt="" />
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div className="postReact">
-            {like ? (
+            {liked ? (
               <Box
                 sx={{ display: "flex", gap: "0.3rem" }}
                 onClick={() => {
-                  likePost(data.posts._id);
+                  like(data.posts._id);
 
                   // setLike(like ? false : true);
                 }}
               >
                 <FavoriteIcon sx={{ color: red[500] }} />
                 <Typography>
-                  {likeCount === 0 ? null : likeCount + " Likes"}
+                  {data.posts.likedUsers.length === 0
+                    ? null
+                    : data.posts.likedUsers.length + " Likes"}
                 </Typography>
               </Box>
             ) : (
               <Box
                 sx={{ display: "flex", gap: "0.3rem" }}
                 onClick={() => {
-                  likePost(data.posts._id);
+                  like(data.posts._id);
                 }}
               >
                 <FavoriteBorderIcon />
                 <Typography>
-                  {likeCount === 0 ? null : likeCount + " Likes"}
+                  {data.posts.likedUsers.length === 0
+                    ? null
+                    : data.posts.likedUsers.length + " Likes"}
                 </Typography>
               </Box>
             )}
-            <Box
-                sx={{ display: "flex", gap: "0.3rem" }}
-              >
-                <CommentIcon onClick={() => openCommentBox(data.posts._id)} />
-                <Typography>
-                  {data.posts.comments.length === 0 ? null : data.posts.comments.length}
-                </Typography>
-              </Box>
+            <Box sx={{ display: "flex", gap: "0.3rem" }}>
+              <CommentIcon onClick={() => openCommentBox(data.posts._id)} />
+              <Typography>
+                {data.posts.comments.length === 0
+                  ? null
+                  : data.posts.comments.length}
+              </Typography>
+            </Box>
             {/* <ShareIcon /> */}
           </div>
         </div>
@@ -432,7 +441,7 @@ const Post = ({ data, liked, getPosts }) => {
                     <Box
                       sx={{ display: "flex", justifyContent: "space-between" }}
                     >
-                      <Box sx={{ display: "flex",gap:'1rem' }}>
+                      <Box sx={{ display: "flex", gap: "1rem" }}>
                         {/* {val.userId.profilePic ? (
                           <div
                             className="commentProfile"
@@ -466,8 +475,7 @@ const Post = ({ data, liked, getPosts }) => {
                         </Typography>
                       </Box>
                       <Typography sx={{ fontSize: "11px" }}>
-                        {/* {format(val.date)} */}
-                        {timeAgo.format(new Date( val.date))}
+                        {timeAgo.format(new Date(val.date))}
                       </Typography>
                     </Box>
                     <Box
@@ -476,12 +484,14 @@ const Post = ({ data, liked, getPosts }) => {
                       <Typography sx={{ fontSize: "15px" }}>
                         {val.content}
                       </Typography>
-                      {!commentsDeleter && (
+                      {/* {!commentsDeleter && ( */}
+                      {(data.posts.userId === currentUser) |
+                      (val.userId === currentUser) ? (
                         <DeleteIcon
-                          onClick={() => deleteComment(val._id, data.posts._id)}
+                          onClick={() =>deleteComment(val._id, data.posts._id)}
                           sx={{ fontSize: "15px", cursor: "pointer" }}
                         />
-                      )}
+                      ) : null}
                     </Box>
                   </Box>
                 );

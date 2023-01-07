@@ -10,9 +10,12 @@ const NotificationsSlice = createSlice({
     },
     seenNotifications:(state,action)=>{
         state.seen = action.payload.notifications;
-    }
+    },
+    resetNotifications:(state,action)=>{
+        state.seen = initialState.seen;
+    },
   },
 });
 
-export const { setNotifications,seenNotifications } = NotificationsSlice.actions;
+export const { setNotifications,seenNotifications,resetNotifications } = NotificationsSlice.actions;
 export default NotificationsSlice.reducer;

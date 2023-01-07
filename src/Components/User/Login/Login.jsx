@@ -24,9 +24,8 @@ import {
   useFormik,
   // Formik
 } from "formik";
-import {user} from '../../../Redux/UserSlice'
+import { accessToken, user } from "../../../Redux/UserSlice";
 import { useDispatch, useSelector } from "react-redux";
-
 
 const initialValues = {
   usernameOrEmail: "",
@@ -45,7 +44,8 @@ const validationSchema = Yup.object({
 });
 
 function Login() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
   const formik = useFormik({
     initialValues,
     onSubmit: (values) => {
@@ -56,10 +56,11 @@ function Login() {
           data: values,
         })
           .then((response) => {
-            console.log(response.data);
+            // console.log(response.data,'Data');
             if (response.data.success) {
-              dispatch(user({user:response.data.user}))
-              localStorage.setItem("userToken", response.data.accessToken);
+              dispatch(user({ user: response.data.user }));
+              // dispatch(accessToken({accessToken:response.data.accessToken}))
+              localStorage.setItem("userToken", response.data.accessToken)
               localStorage.setItem("user", JSON.stringify(response.data.user));
               navigate("/");
             } else {
@@ -85,11 +86,12 @@ function Login() {
             });
           });
       } catch (err) {
-        console.log("LOGIN ERROR", err)
+        console.log("LOGIN ERROR", err);
       }
     },
     validationSchema,
   });
+
   const navigate = useNavigate();
   const theme = createTheme({
     palette: {

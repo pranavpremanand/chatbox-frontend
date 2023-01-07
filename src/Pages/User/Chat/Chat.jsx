@@ -93,14 +93,14 @@ const Chat = () => {
       <div className="leftSide">
         <LeftSide />
       </div>
-      <div className="chatSide">
+      <div className="chatSide" style={{backgroundColor:'whitesmoke',margin:'1rem',borderRadius:'1rem',padding:'5px'}}>
         <div
           className="Chat"
           style={{ marginTop: "50px", position: "relative", minHeight: "80vh" }}
         >
           <div className="Left-side-chat">
-            <h4>Chats</h4>
-            <div className="Chat-list" style={{maxHeight:'400px',overflow:'scroll'}}>
+            <div className="Chat-list" style={{border:'1px solid purple',maxHeight:'520px',overflow:'scroll',backgroundColor:'beige',borderRadius:'10px'}}>
+            <h4 style={{alignSelf:'center'}}><u>Chats</u></h4>
               {chats.map((chat) => {
                 return (
                   <div onClick={() => createChat(chat)}>
@@ -111,7 +111,6 @@ const Chat = () => {
             </div>
           </div>
           <div className="Right-side-chat">
-            {/* <div style={{}}></div> */}
             <Chatbox receiveMessage={receiveMessage} setSendMessage={setSendMessage} chat={currentChat} currentUserId={user?._id} />
           </div>
         </div>

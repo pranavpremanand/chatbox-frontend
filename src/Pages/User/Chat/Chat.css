@@ -1,7 +1,7 @@
 .Chat {
     position: relative;
     display: grid;
-    grid-template-columns: 22% auto;
+    grid-template-columns: 30% auto;
     gap: 1rem;
   }
   
@@ -30,6 +30,7 @@
   }
   
   .Right-side-chat {
+    width: auto;
     display: flex;
     flex-direction: column;
     /* gap: 1rem; */

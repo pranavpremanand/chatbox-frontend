@@ -27,12 +27,14 @@ import {
 
 const Options = () => {
   const dispatch = useDispatch();
-
-  const notifications = useSelector(
-    (state) => state.notifications.notifications
-  );
+  const user = JSON.parse(localStorage.getItem('user'))
+  const notifications = user.unseenNotifications.filter((val)=>val.userId!==user._id)
+  // const notifications = useSelector(
+  //   (state) => state.notifications.notifications
+  // );
   const logOut = () => {
     localStorage.removeItem("userToken");
+    localStorage.removeItem("user");
     dispatch(resetUser());
     dispatch(resetComments());
     dispatch(resetPosts());
@@ -42,22 +44,17 @@ const Options = () => {
     navigate("/login");
   };
 
-  useEffect(() => {
-    // const user = JSON.parse(localStorage.getItem('user'))
-    // console.log('user',user)
-    getNotificationsData();
-  },[]);
-  const getNotificationsData = async () => {
-    const { data } = await getNotifications();
-    console.log('Notifications',data)
-    dispatch(setNotifications({ notifications: data }));
-  };
+  // useEffect(() => {
+  //   // const user = JSON.parse(localStorage.getItem('user'))
+  //   // console.log('user',user)
+  //   getNotificationsData();
+  // },[]);
+  // const getNotificationsData = async () => {
+  //   const { data } = await getNotifications();
+  //   dispatch(setNotifications({ notifications: data }));
+  // };
 
   const handleClickNotifications = async () => {
-    // const { data } = await seenAllNotifications();
-    // console.log('Notifications',data)
-    // dispatch(setNotifications({ notifications: data }));
-
     navigate("/notifications");
   };
 

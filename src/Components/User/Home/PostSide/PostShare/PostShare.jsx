@@ -18,21 +18,9 @@ import { DefaultProfile } from "../../../../../Data/DefaultProfile";
 const PostShare = ({ getPosts }) => {
   const [img, setImg] = useState("");
   const [formData, setFormData] = useState("");
-  const dispatch = useDispatch();
   const [postData, setPostData] = useState({ image: "", description: "" });
   const userInfo = useSelector((state) => state.user.user);
   const imgRef = useRef();
-
-  useEffect(() => {
-    getUser();
-  }, []);
-
-  const getUser = async () => {
-    await axios.get("/user/get-user-info-by-id").then((response) => {
-      // console.log('USERIS HERE',response.data.data);
-      dispatch(user({ user: response.data.data }));
-    });
-  };
 
   const onImgChange = (file) => {
     console.log("file", file.target.files[0]);
@@ -43,7 +31,6 @@ const PostShare = ({ getPosts }) => {
     setFormData(fData);
     if (file.target.files && file.target.files[0]) {
       let image = file.target.files[0];
-      //   console.log('URL.createObjectURL(image)',URL.createObjectURL(image))
       setImg({ image: URL.createObjectURL(image) });
     }
   };
@@ -57,7 +44,6 @@ const PostShare = ({ getPosts }) => {
         formData
       );
       if (response.data) {
-        // console.log(response.data.secure_url);
         image = response.data.secure_url;
       }
     }
@@ -101,7 +87,7 @@ const PostShare = ({ getPosts }) => {
       className="postShare"
       style={{ display: "flex", alignItems: "center" }}
     >
-      {userInfo.profilePic &&
+      {/* {userInfo.profilePic &&
         <div
           style={{
             backgroundImage: `url(${userInfo.profilePic})`,
@@ -111,7 +97,7 @@ const PostShare = ({ getPosts }) => {
             backgroundSize: "cover",
             borderRadius: "50%",
           }}
-        ></div>}
+        ></div>} */}
       {/* // ) : (
       //   <img src={DefaultProfile} alt="" />
       // )} */}

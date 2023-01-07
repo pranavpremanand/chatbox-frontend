@@ -35,8 +35,8 @@ const userId=data._id
           <div
             style={{
               backgroundImage: `url(${userData.profilePic})`,
-              width: "3rem",
-              height: "3rem",
+              width: "2.5rem",
+              height: "2.5rem",
               borderRadius: "50%",
               backgroundPosition: "center",
               backgroundSize: "cover",

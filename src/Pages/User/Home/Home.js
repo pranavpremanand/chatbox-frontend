@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../../APIs/axios";
+// import axios from 'axios'
 import "./Home.css";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -8,33 +9,28 @@ import PostSide from "../../../Components/User/Home/PostSide/PostSide";
 import RightSide from "../../../Components/User/Home/RightSide/RightSide";
 import { createTheme } from "@mui/material/styles";
 import {createSlice} from '@reduxjs/toolkit'
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { allPosts } from "../../../Redux/PostSlice";
+import { user } from "../../../Redux/UserSlice";
 // import useMediaQuery from '@mui/material/useMediaQuery';
 // import { createTheme, ThemeProvider } from '@mui/material/styles';
 function Home() {
-
-
-
   // const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const navigate = useNavigate();
+    // const accessToken = useSelector((state)=>state.user.user.accessToken)
   useEffect(() => {
-    // console.log('Mounting')
-    getData();
-    // return console.log('Unmounting')
+    getPosts();
   }, []);
   const dispatch = useDispatch();
 
   const getPosts = async () => {
   try{
-    await axios.get("/user/posts").then((response) => {
-        const data = response.data.posts;
+    const response = await axios.get('/user/posts')
         dispatch(
           allPosts({
-            posts: data,
-          })
-        );
-      });
+            posts: response.data.posts,
+          }))
+          dispatch(user({user:response.data.user}))
   }catch(err){
     console.log(err);
   }
@@ -52,7 +48,7 @@ function Home() {
   const [posts,setPosts]=useState([])
   const getData = async () => {
     try {
-        axios.get('/user/posts').then((response)=>{
+        await axios.get('/user/posts').then((response)=>{
           const data = response.data.posts
           setPosts({data})
         })

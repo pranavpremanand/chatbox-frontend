@@ -28,7 +28,8 @@ const People = () => {
   const [followersTrue, setFollowersTrue] = useState(false);
 
   useEffect(() => {
-    getFollowing();
+    // getFollowing();
+    getWhoToFollow()
   }, []);
 
   //Get following users
@@ -183,22 +184,22 @@ const People = () => {
           aria-label="secondary tabs example"
         >
           <Tab
-            onClick={getFollowing}
+            onClick={getWhoToFollow}
             sx={{ textTransform: "capitalize" }}
             value="one"
+            label="Who to follow"
+          />
+          <Tab
+            onClick={getFollowing}
+            sx={{ textTransform: "capitalize" }}
+            value="two"
             label="Following"
           />
           <Tab
             onClick={getFollowers}
             sx={{ textTransform: "capitalize" }}
-            value="two"
-            label="Followers"
-          />
-          <Tab
-            onClick={getWhoToFollow}
-            sx={{ textTransform: "capitalize" }}
             value="three"
-            label="Who to follow"
+            label="Followers"
           />
         </Tabs>
         <Box>

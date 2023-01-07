@@ -9,7 +9,6 @@ import { allPosts } from "../../../../../Redux/PostSlice";
 const Posts = ({getPosts}) => {
   const postData = useSelector((state) => state.posts.posts);
   // const [postData,setPostData] = useState([])
-  const dispatch = useDispatch();
   useEffect(() => {
   getPosts()
   }, []);

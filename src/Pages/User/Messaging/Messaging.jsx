@@ -1,7 +1,7 @@
 import React from 'react'
 import LeftSide from '../../../Components/User/Home/LeftSide/LeftSide'
 import RightSide from '../../../Components/User/Home/RightSide/RightSide'
-import { Chat } from '../../../Components/User/Messaging/Chat'
+import { Chat, ChatComponent } from '../../../Components/User/Messaging/Chat'
 
 const Messaging = () => {
   return (
@@ -10,7 +10,8 @@ const Messaging = () => {
         <LeftSide />
       </div>
       <div className='chat'>
-        <Chat/>
+        {/* <Chat/> */}
+        <ChatComponent/>
       </div>
       <div>
         <RightSide/>

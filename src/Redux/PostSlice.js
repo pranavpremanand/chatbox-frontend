@@ -20,17 +20,18 @@ const postSlice = createSlice({
         (val) => val._id !== action.payload.posts
       );
     },
-    // likePost: (state, action) => {
-    //   const post = state.posts.find((val) => val._id === action.payload);
-    //   post.isLiked = true;
-    //   post.likedUsers.push(1);
-    // },
-    // unlikePost: (state, action) => {
-    //   const post = state.posts.find((val) => val._id === action.payload);
-    //   console.log("POST IS HERE", state.posts);
-    //   post.likedUsers = post.likedUsers.filter((val) => val !== 1);
-    //   post.isLiked = false;
-    // },
+    likePost: (state, action) => {
+      const post = state.posts.find((val)=>val._id===action.payload.postId)
+      post.isLiked = true
+      // const post = state.posts.find((val) => val._id === action.payload);
+      // post.isLiked = true;
+      post.likedUsers.push(action.payload.userId);
+    },
+    unlikePost: (state, action) => {
+    const post = state.posts.find((val)=>val._id===action.payload.postId)
+    post.isLiked = false
+    post.likedUsers.pull(action.payload.userId);
+    },
     resetPosts: () => initialState,
   },
 });
