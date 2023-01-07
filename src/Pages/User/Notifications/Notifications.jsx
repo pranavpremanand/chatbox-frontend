@@ -29,21 +29,14 @@ const Notifications = () => {
      const response = await axios.get("/user/seen-notifications");
     //  seenAllNotifications()
     console.log(response.data,'response')
-    //  dispatch(user({ user: response.data }));
-    //  localStorage.setItem('user',JSON.stringify(response.data))
-    //  setData(response.data.seenNotifications )
-      // .then((response) => {
-      //   console.log("nnnnnnn")
-      //   const { data } = response;
-      //   dispatch(user({ user: data }));
-      //   localStorage.setItem('user',JSON.stringify(data))
-      //   console.log("seen",data.seenNotifications)
-      //   setData(data.seenNotifications )
-      //   dispatch(
-      //     seenNotifications({ notifications: data.seenNotifications })
-      //   );
-      //   dispatch(resetNotifications({ notifications: [] }));
-      // }).catch(err=>console.log("err",err))
+    // var out="[";
+    // for(var indx=0;indx<response.data.length-1;indx++){
+    //   out+=JSON.parse(response.data[indx],null,4)+",";
+    // }
+    // out+=JSON.parse(response.data[response.data.length-1],null,4)+"]";
+     dispatch(user({ user: response.data }));
+     localStorage.setItem('user',JSON.stringify(response.data))
+     setData(response.data.seenNotifications)
     } catch (err) {
       console.log(err);
     }
@@ -74,6 +67,7 @@ const Notifications = () => {
                 }}
               >
                 {data.map((notification) => {
+                  console.log(notification,'1')
                   return (
                     currentUser !== notification.userId._id && (
                       <NotificationsList data={notification} />
