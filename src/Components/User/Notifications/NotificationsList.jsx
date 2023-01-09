@@ -33,8 +33,9 @@ const NotificationsList = ({ data }) => {
             </React.Fragment>
           }
         />
-        <ListItemAvatar>
-            {/* <Box
+        {data.postId.image && (
+          <ListItemAvatar>
+            <Box
               // component="img"
               sx={{
                 backgroundImage: `url(${data.postId.image})`,
@@ -47,10 +48,10 @@ const NotificationsList = ({ data }) => {
                 maxHeight: "8rem",
                 maxWidth: "8rem",
               }}
-            /> */}
-        </ListItemAvatar>
+            />
+          </ListItemAvatar>
+        )}
       </ListItem>
-      <Divider variant="inset" component="li" />
     </Box>
   );
 };

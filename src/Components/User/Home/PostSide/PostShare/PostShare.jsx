@@ -87,7 +87,7 @@ const PostShare = ({ getPosts }) => {
       className="postShare"
       style={{ display: "flex", alignItems: "center" }}
     >
-      {/* {userInfo.profilePic &&
+      {userInfo.profilePic ?
         <div
           style={{
             backgroundImage: `url(${userInfo.profilePic})`,
@@ -97,10 +97,9 @@ const PostShare = ({ getPosts }) => {
             backgroundSize: "cover",
             borderRadius: "50%",
           }}
-        ></div>} */}
-      {/* // ) : (
-      //   <img src={DefaultProfile} alt="" />
-      // )} */}
+        ></div>:
+        <img src={DefaultProfile} alt="" />
+      }
       <div>
         <div
           style={{
@@ -119,21 +118,19 @@ const PostShare = ({ getPosts }) => {
             className="postOptions"
             style={{ display: "flex", flexDirection: "column" }}
           >
-            <div onClick={() => imgRef.current.click()}>
-              <Typography
+            <Button onClick={() => imgRef.current.click()}
                 sx={{
-                  color: purple[600],
-                  fontSize: "medium",
-                  display: "flex",
-                  marginBottom: "1rem",
-                  justifyContent: "space-between",
+                  // color: purple[600],
+                  backgroundColor: blue[600],
+                  fontSize: "small",
+                  marginBottom: "1rem"
                 }}
-                className="option"
-              >
-                <ImageRoundedIcon />
-                Photo
-              </Typography>
-            </div>
+                size='small'
+                variant='contained'
+                startIcon={<ImageRoundedIcon />}
+                className="option text-capitalize"
+                >Photo
+            </Button>
             {/* <div>
             <Typography
               sx={{ color: purple[700], fontSize: "small" }}
@@ -164,10 +161,9 @@ const PostShare = ({ getPosts }) => {
             {/* <div className="postOptions"></div> */}
             <Button
               variant="contained"
-              sx={{ textTransform: "capitalize" }}
-              color="secondary"
+              sx={{ textTransform: "capitalize", backgroundColor: blue[600]  }}
+              // color="secondary"
               onClick={uploadPost}
-              // style={{ backgroundColor: purple[500] }}
               size="small"
               // sx={{ backgroundColor: teal[700] }}
               className="btn btn-sm text-white"

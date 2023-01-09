@@ -103,7 +103,7 @@ const Chatbox = ({ receiveMessage, setSendMessage, chat, currentUserId }) => {
       <div
         className="ChatBox-container"
         style={{
-          border: "1px solid purple",
+          // border: "1px solid blue",
           display: "flex",
           flexDirection: "column",
           padding: "1rem",

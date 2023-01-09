@@ -5,7 +5,7 @@
   /* border-radius: 50%; */
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
+  background-repeat: repeat;
 }
 .profileCard {
   border-radius: 1.5rem;

@@ -1,4 +1,4 @@
-import { Container, List, Typography } from "@mui/material";
+import { Container, Divider, List, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,30 +13,30 @@ import {
 } from "../../../Redux/NotificationsSlice";
 import { user } from "../../../Redux/UserSlice";
 import "./Notifications.css";
-import axios from '../../../APIs/axios'
+import axios from "../../../APIs/axios";
 
 const Notifications = () => {
   const dispatch = useDispatch();
-  let currentUser = JSON.parse(localStorage.getItem('user'))
-  currentUser = currentUser._id
+  let currentUser = JSON.parse(localStorage.getItem("user"));
+  currentUser = currentUser._id;
   // const notifications = useSelector((state) => state.notifications.seen);
-  const [data,setData]=useState([])
+  const [data, setData] = useState([]);
   useEffect(() => {
     getNotificationsData();
   }, []);
   const getNotificationsData = async () => {
     try {
-     const response = await axios.get("/user/seen-notifications");
-    //  seenAllNotifications()
-    console.log(response.data,'response')
-    // var out="[";
-    // for(var indx=0;indx<response.data.length-1;indx++){
-    //   out+=JSON.parse(response.data[indx],null,4)+",";
-    // }
-    // out+=JSON.parse(response.data[response.data.length-1],null,4)+"]";
-     dispatch(user({ user: response.data }));
-     localStorage.setItem('user',JSON.stringify(response.data))
-     setData(response.data.seenNotifications)
+      const response = await axios.get("/user/seen-notifications");
+      //  seenAllNotifications()
+      console.log(response.data, "response");
+      // var out="[";
+      // for(var indx=0;indx<response.data.length-1;indx++){
+      //   out+=JSON.parse(response.data[indx],null,4)+",";
+      // }
+      // out+=JSON.parse(response.data[response.data.length-1],null,4)+"]";
+      dispatch(user({ user: response.data }));
+      localStorage.setItem("user", JSON.stringify(response.data));
+      setData(response.data.seenNotifications);
     } catch (err) {
       console.log(err);
     }
@@ -67,10 +67,13 @@ const Notifications = () => {
                 }}
               >
                 {data.map((notification) => {
-                  console.log(notification,'1')
+                  console.log(notification, "1");
                   return (
                     currentUser !== notification.userId._id && (
-                      <NotificationsList data={notification} />
+                      <>
+                        <NotificationsList data={notification} />
+                        <Divider variant="inset" component="li" />
+                      </>
                     )
                   );
                 })}

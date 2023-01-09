@@ -3,7 +3,7 @@ import "./Post.css";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
-import { red } from "@mui/material/colors";
+import { blue, red } from "@mui/material/colors";
 import {
   Avatar,
   Box,
@@ -33,6 +33,7 @@ import TimeAgo from "javascript-time-ago";
 
 // English.
 import en from "javascript-time-ago/locale/en";
+import { useNavigate } from "react-router-dom";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -42,7 +43,7 @@ const Post = ({ data, liked, getPosts }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const currentUser = useSelector((state) => state.user.user._id);
   const commentsData = useSelector((state) => state.comments.comments);
-
+  const navigate = useNavigate()
   const [commentBox, setCommentBox] = useState(false);
   const [commentInput, setCommentInput] = useState("");
   const [commentsDeleter, setCommentsDeleter] = useState(false);
@@ -167,7 +168,7 @@ const Post = ({ data, liked, getPosts }) => {
         .then((response) => {
           if (response.data.success) {
             getComments(postId);
-            getPosts()
+            getPosts();
           }
         })
         .catch((err) => {
@@ -234,7 +235,7 @@ const Post = ({ data, liked, getPosts }) => {
                 </div>
               )}
               <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography>
+                <Typography onClick={()=>navigate('/profile')}>
                   <b>{data.fullName}</b>
                 </Typography>
                 <Typography>{"@" + data.username}</Typography>
@@ -335,7 +336,12 @@ const Post = ({ data, liked, getPosts }) => {
             </Typography>
           </Box>
         </div>
-        <img src={data.posts.image} style={{maxHeight:'450px'}} width="" alt="" />
+        <img
+          src={data.posts.image}
+          style={{ maxHeight: "450px" }}
+          width=""
+          alt=""
+        />
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div className="postReact">
             {liked ? (
@@ -420,8 +426,9 @@ const Post = ({ data, liked, getPosts }) => {
               <Button
                 onClick={() => submitComment(data.posts._id)}
                 variant="contained"
-                sx={{ textTransform: "capitalize" }}
-                color="secondary"
+                sx={{ textTransform: "capitalize", backgroundColor: blue[600] }}
+                size="small"
+                className="btn btn-sm text-white"
               >
                 Comment
               </Button>
@@ -486,9 +493,9 @@ const Post = ({ data, liked, getPosts }) => {
                       </Typography>
                       {/* {!commentsDeleter && ( */}
                       {(data.posts.userId === currentUser) |
-                      (val.userId === currentUser) ? (
+                      (val.userId._id === currentUser) ? (
                         <DeleteIcon
-                          onClick={() =>deleteComment(val._id, data.posts._id)}
+                          onClick={() => deleteComment(val._id, data.posts._id)}
                           sx={{ fontSize: "15px", cursor: "pointer" }}
                         />
                       ) : null}
