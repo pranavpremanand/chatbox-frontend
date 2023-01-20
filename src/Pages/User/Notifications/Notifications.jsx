@@ -1,19 +1,13 @@
 import { Container, Divider, List, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { seenAllNotifications } from "../../../APIs/Notifications";
+import { useDispatch } from "react-redux";
 import LeftSide from "../../../Components/User/Home/LeftSide/LeftSide";
 import RightSide from "../../../Components/User/Home/RightSide/RightSide";
 import NotificationsList from "../../../Components/User/Notifications/NotificationsList";
-import {
-  setNotifications,
-  seenNotifications,
-  resetNotifications,
-} from "../../../Redux/NotificationsSlice";
 import { user } from "../../../Redux/UserSlice";
 import "./Notifications.css";
-import axios from "../../../APIs/axios";
+import axios from "../../../APIs/UserAPI";
 
 const Notifications = () => {
   const dispatch = useDispatch();
@@ -69,7 +63,7 @@ const Notifications = () => {
                 {data.map((notification) => {
                   console.log(notification, "1");
                   return (
-                    currentUser !== notification.userId._id && (
+                    currentUser !== notification?.userId?._id && (
                       <>
                         <NotificationsList data={notification} />
                         <Divider variant="inset" component="li" />

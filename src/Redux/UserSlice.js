@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState= { user: {} }
+const initialState= { user: {},changePassword:false }
 
 const userSlice = createSlice({
   name: "user",
@@ -13,6 +13,9 @@ const userSlice = createSlice({
     resetUser:()=>initialState,
     accessToken:(state,action)=>{
       state.user.accessToken = action.payload.accessToken
+    },
+    changePassword:(state,action)=>{
+      state.changePassword = action.payload
     }
     // addCoverPic:(state,action)=>{
     //   console.log('USERSDATA',state)
@@ -21,5 +24,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { user,resetUser,accessToken } = userSlice.actions;
+export const { user,resetUser,accessToken,changePassword } = userSlice.actions;
 export default userSlice.reducer;

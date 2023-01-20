@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import "../LoginSignup.css";
-import { json, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import {
@@ -14,6 +14,8 @@ import {
   Link,
   Button,
   FormHelperText,
+  Divider,
+  Modal,
 } from "@mui/material";
 // import { Person } from "@mui/icons-material";
 import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
@@ -24,8 +26,24 @@ import {
   useFormik,
   // Formik
 } from "formik";
-import { accessToken, user } from "../../../Redux/UserSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { changePassword, user } from "../../../Redux/UserSlice";
+import { useDispatch } from "react-redux";
+import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
+
+const style = {
+  position: "absolute",
+  display: "flex",
+  flexDirection: "column",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  bgcolor: "#ffff",
+  width: 300,
+  // minWidth:100,
+  borderRadius: "10px",
+  boxShadow: 24,
+  p: 4,
+};
 
 const initialValues = {
   usernameOrEmail: "",
@@ -43,55 +61,134 @@ const validationSchema = Yup.object({
     .max(16, "Enter your correct password"),
 });
 
+const forgotPasswordSchema = {
+  email: "",
+};
+//Forgot password validation schema
+const forgotPasswordValidation = Yup.object({
+  email: Yup.string()
+    .email("Invalid Format")
+    .matches(
+      /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)*$/,
+      "Enter a valid email address"
+    )
+    .required("This field is required"),
+});
+
 function Login() {
   const dispatch = useDispatch();
-
-  const formik = useFormik({
-    initialValues,
-    onSubmit: (values) => {
+  const [forgotPasswordModal, setForgotPasswordModal] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpField, setOtpField] = useState(false);
+  //Send OTP
+  const forgotPassword = useFormik({
+    initialValues: forgotPasswordSchema,
+    onSubmit: async (values) => {
       try {
-        axios({
-          url: "/user/login",
-          method: "post",
-          data: values,
-        })
-          .then((response) => {
-            // console.log(response.data,'Data');
-            if (response.data.success) {
-              dispatch(user({ user: response.data.user }));
-              // dispatch(accessToken({accessToken:response.data.accessToken}))
-              localStorage.setItem("userToken", response.data.accessToken)
-              localStorage.setItem("user", JSON.stringify(response.data.user));
-              navigate("/");
-            } else {
-              toast(response.data.message, {
-                icon: "⚠️",
-                style: {
-                  borderRadius: "10px",
-                  background: "#333",
-                  color: "#fff",
-                },
-              });
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            toast("Something went wrong. Try again.", {
-              icon: "❌",
+        if (otp === "") {
+          const response = await axios.post("/user/otp-login", values);
+          if (response.data.message === "OTP sent") {
+            toast("OTP sent to your email", {
+              icon: "✅",
               style: {
                 borderRadius: "10px",
                 background: "#333",
                 color: "#fff",
               },
             });
+            setOtpField(true);
+            setOtp(response.data.response.otp);
+          } else {
+            toast(response.data.message, {
+              icon: "⚠️",
+              style: {
+                borderRadius: "10px",
+                background: "#333",
+                color: "#fff",
+              },
+            });
+          }
+          // } else if (otp !== "") {
+          //   toast("OTP already has been sent", {
+          //     icon: "⚠️",
+          //     style: {
+          //       borderRadius: "10px",
+          //       background: "#333",
+          //       color: "#fff",
+          //     },
+          //   });
+        } else if (otp === values.otp) {
+          values.loginWithOtp = true;
+          login(values);
+        } else {
+          toast("Entered OTP is incorrect", {
+            icon: "❌",
+            style: {
+              borderRadius: "10px",
+              background: "#333",
+              color: "#fff",
+            },
           });
+        }
       } catch (err) {
-        console.log("LOGIN ERROR", err);
+        console.log("forgot password error", err);
       }
+    },
+    validationSchema: forgotPasswordValidation,
+  });
+
+  //Login
+  const formik = useFormik({
+    initialValues,
+    onSubmit: (values) => {
+      login(values);
     },
     validationSchema,
   });
 
+  const login = (values) => {
+    try {
+      axios({
+        url: "/user/login",
+        method: "post",
+        data: values,
+      })
+      .then((response) => {
+          if (response.data.success) {
+            if (response.data.otpLoginSuccess) {
+              dispatch(changePassword(true))
+              setOtpField(false);
+            }
+            dispatch(user({ user: response.data.user }));
+            localStorage.setItem("userToken", response.data.accessToken);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+            navigate("/");
+          } else {
+            toast(response.data.message, {
+              icon: "⚠️",
+              style: {
+                borderRadius: "10px",
+                background: "#333",
+                color: "#fff",
+              },
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          toast("Something went wrong. Try again.", {
+            icon: "❌",
+            style: {
+              borderRadius: "10px",
+              background: "#333",
+              color: "#fff",
+            },
+          });
+        });
+    } catch (err) {
+      console.log("LOGIN ERROR", err);
+    }
+  };
   const navigate = useNavigate();
   const theme = createTheme({
     palette: {
@@ -202,10 +299,19 @@ function Login() {
               </Button>
             </Box>
           </Box>
-          <Grid container justifyContent="flex-end">
+          <Grid container justifyContent="space-between">
             <Grid item>
               <Link
-                href="#"
+                sx={{ cursor: "pointer" }}
+                onClick={() => setForgotPasswordModal(true)}
+                variant="body2"
+              >
+                Forgot password?
+              </Link>
+            </Grid>
+            <Grid item>
+              <Link
+                sx={{ cursor: "pointer" }}
                 onClick={() => navigate("/signup")}
                 variant="body2"
               >
@@ -215,6 +321,85 @@ function Login() {
           </Grid>
         </Container>
       </ThemeProvider>
+      <Modal aria-labelledby="" aria-describedby="" open={forgotPasswordModal}>
+        <Box sx={style}>
+          <Box
+            sx={{
+              display: "flex",
+              // alignItems: "center",
+              justifyContent: "space-between",
+              padding: "10px",
+            }}
+          >
+            <Typography sx={{ fontWeight: "500" }} id="">
+              Forgot password?
+            </Typography>
+            <CancelPresentationIcon
+              sx={{ cursor: "pointer" }}
+              onClick={() => setForgotPasswordModal(false)}
+            />
+          </Box>
+          <Box component="form" onSubmit={forgotPassword.handleSubmit}>
+            <TextField
+              name="email"
+              fullWidth
+              placeholder="Enter your email here"
+              id="email"
+              label="Email"
+              autoFocus
+              sx={{ marginTop: 1 }}
+              onChange={forgotPassword.handleChange}
+              value={forgotPassword.values.email}
+            />
+            {forgotPassword.touched.email && forgotPassword.errors.email ? (
+              <FormHelperText sx={{ color: "red" }}>
+                {forgotPassword.errors.email}
+              </FormHelperText>
+            ) : null}
+            {!otpField ? (
+              <Button
+                variant="contained"
+                type="submit"
+                sx={{ mt: 2, mb: 2 }}
+                fullWidth
+                className="text-capitalize"
+              >
+                Send OTP
+              </Button>
+            ) : (
+              <>
+                <TextField
+                  name="otp"
+                  size="small"
+                  // value={OTPcheck}
+                  sx={{ marginTop: 1 }}
+                  required
+                  // value={otp}
+                  // onChange={(event) => {setOTPCheck(event.target.value)}}
+                  value={forgotPassword.values.otp}
+                  onChange={forgotPassword.handleChange}
+                  type="text"
+                  id="otp"
+                  variant="outlined"
+                  label="Enter OTP sent to your email"
+                  fullWidth
+                  placeholder="OTP"
+                  // className={classes.textfield}
+                />
+                <Button
+                  variant="contained"
+                  type="submit"
+                  sx={{ mt: 2, mb: 2 }}
+                  fullWidth
+                  className="text-capitalize"
+                >
+                  Enter OTP To Login
+                </Button>
+              </>
+            )}
+          </Box>
+        </Box>
+      </Modal>
     </div>
   );
 }

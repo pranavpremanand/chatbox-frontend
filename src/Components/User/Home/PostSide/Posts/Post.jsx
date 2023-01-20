@@ -4,14 +4,22 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
 import { blue, red } from "@mui/material/colors";
+import ReportIcon from "@mui/icons-material/Report";
 import {
   Avatar,
   Box,
   Button,
   Divider,
+  Fade,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
   IconButton,
   Menu,
   MenuItem,
+  Modal,
+  Radio,
+  RadioGroup,
   Typography,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -19,23 +27,45 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { useState } from "react";
-import axios from "../../../../../APIs/axios";
+import UserAPI from "../../../../../APIs/UserAPI";
 import { toast } from "react-hot-toast";
 import {
   postDelete,
   likePost,
   unlikePost,
-  allPosts,
+  reportPosts,
 } from "../../../../../Redux/PostSlice";
 import { allComments } from "../../../../../Redux/CommentsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import TimeAgo from "javascript-time-ago";
+import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 
 // English.
 import en from "javascript-time-ago/locale/en";
 import { useNavigate } from "react-router-dom";
+import userAPI from "../../../../../APIs/UserAPI";
+import {
+  loggedUserStatus,
+  setUserProfile,
+} from "../../../../../Redux/ProfileSlice";
+import { Verified as VerifiedIcon } from "@mui/icons-material";
 
 TimeAgo.addDefaultLocale(en);
+
+//Modal style
+const style = {
+  position: "absolute",
+  display: "flex",
+  flexDirection: "column",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "50%",
+  bgcolor: "background.paper",
+  borderRadius: "20px",
+  boxShadow: 24,
+  p: 4,
+};
 
 const Post = ({ data, liked, getPosts }) => {
   const timeAgo = new TimeAgo("en-US");
@@ -43,10 +73,13 @@ const Post = ({ data, liked, getPosts }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const currentUser = useSelector((state) => state.user.user._id);
   const commentsData = useSelector((state) => state.comments.comments);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [commentBox, setCommentBox] = useState(false);
   const [commentInput, setCommentInput] = useState("");
-  const [commentsDeleter, setCommentsDeleter] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [reportType, setReportType] = useState("");
+  const reportedPosts = useSelector((state) => state.posts.reportedPosts);
+  const savedPosts = useSelector((state)=>state.savedPosts.savedPosts)
 
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -58,8 +91,7 @@ const Post = ({ data, liked, getPosts }) => {
 
   // Delete post
   const deletePost = (id) => {
-    axios
-      .get(`/user/delete-post/${id}`)
+    UserAPI.get(`/user/delete-post/${id}`)
       .then((response) => {
         if (response.data.success) {
           getPosts();
@@ -97,8 +129,7 @@ const Post = ({ data, liked, getPosts }) => {
   };
 
   const like = (postId) => {
-    axios
-      .get("/user/like-post/" + postId)
+    UserAPI.get("/user/like-post/" + postId)
       .then((response) => {
         if (response.data.success) {
           getPosts();
@@ -119,8 +150,7 @@ const Post = ({ data, liked, getPosts }) => {
   };
 
   const submitComment = (postId) => {
-    axios
-      .post("/user/add-comment/" + postId, { comment: commentInput })
+    UserAPI.post("/user/add-comment/" + postId, { comment: commentInput })
       .then((response) => {
         if (response.data.success) {
           setCommentInput("");
@@ -139,15 +169,9 @@ const Post = ({ data, liked, getPosts }) => {
   };
 
   const getComments = (postId) => {
-    axios
-      .get("/user/get-comments/" + postId)
+    UserAPI.get("/user/get-comments/" + postId)
       .then((response) => {
         if (response.data.success) {
-          if (response.data.comments.userId === currentUser) {
-            setCommentsDeleter(true);
-          } else {
-            setCommentsDeleter(false);
-          }
           const commentsDetails = response.data.comments.comments;
           console.log(commentsDetails, "comments");
           // dispatch(nullComments())
@@ -163,8 +187,7 @@ const Post = ({ data, liked, getPosts }) => {
   //Delete comment
   const deleteComment = (commentId, postId) => {
     try {
-      axios
-        .get(`/user/delete-comment/${commentId}/${postId}`)
+      UserAPI.get(`/user/delete-comment/${commentId}/${postId}`)
         .then((response) => {
           if (response.data.success) {
             getComments(postId);
@@ -178,7 +201,64 @@ const Post = ({ data, liked, getPosts }) => {
       console.log(err);
     }
   };
-  const [dotOptions, setDotOptions] = useState({ options: false, save: true });
+
+  //Report post
+  const reportPost = async (postId) => {
+    try {
+      const response = await userAPI.post(`/user/report-post`, {
+        postId: postId,
+        userId: currentUser,
+        reportType: reportType,
+      });
+      if (response.data.success) {
+        dispatch(reportPosts(postId));
+        setOpenModal(false);
+        toast("You reported the post of " + data.fullName, {
+          icon: "✅",
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
+      }
+    } catch (err) {
+      toast("Something went wrong, try again", {
+        icon: "❌",
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    }
+  };
+
+  const setProfile = (userId) => {
+    userId === currentUser
+      ? dispatch(loggedUserStatus(true))
+      : dispatch(loggedUserStatus(false));
+    dispatch(setUserProfile(userId));
+    navigate("/profile");
+  };
+
+  const savePost = async (postId) => {
+    try {
+      const { data } = await userAPI.get(`/user/save-post/${postId}`);
+      if(data){
+        getPosts()
+      }
+    } catch (err) {
+      toast("Something went wrong, try again", {
+        icon: "❌",
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    }
+  };
 
   return (
     <div className="post" style={{ background: "white", marginTop: "10px" }}>
@@ -200,44 +280,36 @@ const Post = ({ data, liked, getPosts }) => {
             }}
           >
             <Box
+              onClick={() => setProfile(data._id)}
               sx={{
                 display: "flex",
                 justifyContent: "start",
                 alignItems: "center",
                 gap: "0.5rem",
                 marginBottom: "0.5rem",
+                cursor: "pointer",
               }}
             >
-              {data.profilePic ? (
-                <div
-                  className="profile"
-                  style={{
-                    backgroundImage: `url(${data.profilePic})`,
-                  }}
-                ></div>
-              ) : (
-                <div
-                  className="profile"
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    padding: "10px",
-                  }}
-                >
-                  <Avatar
-                    sx={{
-                      fontSize: "3rem",
-                      alignSelf: "center",
-                      borderRadius: "50%",
-                      color: "white",
-                    }}
-                  />
-                </div>
-              )}
+              <Avatar
+                sx={{ width: 50, height: 50 }}
+                src={data.profilePic}
+                alt={data.fullName}
+              />
               <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography onClick={()=>navigate('/profile')}>
-                  <b>{data.fullName}</b>
-                </Typography>
+                <Box
+                  sx={{ display: "flex", gap: "0.2rem", alignItems: "center" }}
+                >
+                  <Typography>
+                    <b>{data.fullName}</b>
+                  </Typography>
+                  {data.verifiedUser && (
+                    <VerifiedIcon
+                      sx={{ color: blue[600] }}
+                      color={blue[600]}
+                      fontSize="xsmall"
+                    />
+                  )}
+                </Box>
                 <Typography>{"@" + data.username}</Typography>
                 <Typography sx={{ fontSize: "12px" }}>
                   {timeAgo.format(new Date(data.posts.createdAt))}
@@ -310,23 +382,32 @@ const Post = ({ data, liked, getPosts }) => {
                 <DeleteIcon sx={{ mr: 5 }} /> <Typography>Delete</Typography>
               </MenuItem>
             )}
-
+            {!data.reported &&
+              data._id !== currentUser &&
+              !reportedPosts.includes(data.posts._id) && (
+                <MenuItem
+                  onClick={() => setOpenModal(true)}
+                  sx={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <ReportIcon sx={{ mr: 5 }} /> <Typography>Report</Typography>
+                </MenuItem>
+              )}
             <Divider />
-            {dotOptions.save ? (
+            {!savedPosts.some((postData)=>postData.post._id===data.posts._id) ? (
+            <MenuItem
+              onClick={() => savePost(data.posts._id)}
+              sx={{ display: "flex", justifyContent: "space-between" }}
+            >
+              <BookmarkBorderIcon sx={{ mr: 5 }} />{" "}
+              <Typography>Save</Typography>
+            </MenuItem>
+             ) : (
               <MenuItem
-                onClick={() => setDotOptions({ save: false })}
-                sx={{ display: "flex", justifyContent: "space-between" }}
-              >
-                <BookmarkBorderIcon sx={{ mr: 5 }} />{" "}
-                <Typography>Save</Typography>
-              </MenuItem>
-            ) : (
-              <MenuItem
-                onClick={() => setDotOptions({ save: true })}
+                onClick={() => savePost(data.posts._id)}
                 sx={{ display: "flex", justifyContent: "space-between" }}
               >
                 <BookmarkIcon sx={{ mr: 5 }} />{" "}
-                <Typography>Remove from saved</Typography>
+                <Typography>Unsave</Typography>
               </MenuItem>
             )}
           </Menu>
@@ -390,32 +471,7 @@ const Post = ({ data, liked, getPosts }) => {
           <div>
             <Divider sx={{ marginTop: "1rem" }} />
             <div className="commentDiv">
-              {data.profilePic ? (
-                <div
-                  className="commentProfile"
-                  style={{
-                    backgroundImage: `url(${data.profilePic})`,
-                  }}
-                ></div>
-              ) : (
-                <div
-                  className="commentProfile"
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    padding: "5px",
-                  }}
-                >
-                  <Avatar
-                    sx={{
-                      fontSize: "small",
-                      alignSelf: "center",
-                      borderRadius: "50%",
-                      color: "white",
-                    }}
-                  />
-                </div>
-              )}
+              <Avatar src={data.profilePic} alt={data.fullName} />
               <input
                 value={commentInput}
                 className="commentBox"
@@ -423,15 +479,20 @@ const Post = ({ data, liked, getPosts }) => {
                 required
                 onChange={(e) => setCommentInput(e.target.value)}
               />
-              <Button
-                onClick={() => submitComment(data.posts._id)}
-                variant="contained"
-                sx={{ textTransform: "capitalize", backgroundColor: blue[600] }}
-                size="small"
-                className="btn btn-sm text-white"
-              >
-                Comment
-              </Button>
+              {commentInput !== "" && (
+                <Button
+                  onClick={() => submitComment(data.posts._id)}
+                  variant="contained"
+                  sx={{
+                    textTransform: "capitalize",
+                    backgroundColor: blue[600],
+                  }}
+                  size="small"
+                  className="btn btn-sm text-white"
+                >
+                  Comment
+                </Button>
+              )}
             </div>
             <div>
               {commentsData.map((val) => {
@@ -449,32 +510,6 @@ const Post = ({ data, liked, getPosts }) => {
                       sx={{ display: "flex", justifyContent: "space-between" }}
                     >
                       <Box sx={{ display: "flex", gap: "1rem" }}>
-                        {/* {val.userId.profilePic ? (
-                          <div
-                            className="commentProfile"
-                            style={{
-                              backgroundImage: `url(${data.profilePic})`,
-                            }}
-                          ></div>
-                        ) : (
-                          <div
-                            className="commentProfile"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              padding: "5px",
-                            }}
-                          >
-                            <Avatar
-                              sx={{
-                                // fontSize: "10px",
-                                alignSelf: "center",
-                                borderRadius: "50%",
-                                color: "white",
-                              }}
-                            />
-                          </div>
-                        )} */}
                         <Typography
                           sx={{ fontWeight: "bold", fontSize: "14px" }}
                         >
@@ -491,14 +526,13 @@ const Post = ({ data, liked, getPosts }) => {
                       <Typography sx={{ fontSize: "15px" }}>
                         {val.content}
                       </Typography>
-                      {/* {!commentsDeleter && ( */}
                       {(data.posts.userId === currentUser) |
-                      (val.userId._id === currentUser) ? (
+                        (val.userId._id === currentUser) && (
                         <DeleteIcon
                           onClick={() => deleteComment(val._id, data.posts._id)}
                           sx={{ fontSize: "15px", cursor: "pointer" }}
                         />
-                      ) : null}
+                      )}
                     </Box>
                   </Box>
                 );
@@ -507,6 +541,88 @@ const Post = ({ data, liked, getPosts }) => {
           </div>
         )}
       </div>
+      <Modal aria-labelledby="" aria-describedby="" open={openModal}>
+        <Fade in={openModal}>
+          <Box sx={style}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "10px",
+              }}
+            >
+              <Typography id="" variant="h6" component="h2">
+                Why are you reporting this post?
+              </Typography>
+              <CancelPresentationIcon
+                sx={{ cursor: "pointer" }}
+                onClick={() => setOpenModal(false)}
+              />
+            </Box>
+            <Divider />
+            <FormControl>
+              <RadioGroup
+                onChange={(e) => setReportType(e.target.value)}
+                aria-labelledby=""
+                defaultValue=""
+                name=""
+              >
+                <FormControlLabel
+                  value="It's spam"
+                  control={<Radio />}
+                  label="It's spam"
+                />
+                <FormControlLabel
+                  value="I just don't like it"
+                  control={<Radio />}
+                  label="I just don't like it"
+                />
+                <FormControlLabel
+                  value="Hate speech or symbols"
+                  control={<Radio />}
+                  label="Hate speech or symbols"
+                />
+                <FormControlLabel
+                  value="Scam or fraud"
+                  control={<Radio />}
+                  label="Scam or fraud"
+                />
+                <FormControlLabel
+                  value="Nudity or sexual activity"
+                  control={<Radio />}
+                  label="Nudity or sexual activity"
+                />
+                <FormControlLabel
+                  value="Bullying or harassment"
+                  control={<Radio />}
+                  label="Bullying or harassment"
+                />
+              </RadioGroup>
+            </FormControl>
+            <Divider />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "20px",
+              }}
+            >
+              {reportType !== "" && (
+                <Button
+                  onClick={() => reportPost(data.posts._id)}
+                  className="text-capitalize"
+                  size="medium"
+                  variant="contained"
+                  color="primary"
+                >
+                  Submit report
+                </Button>
+              )}
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
     </div>
   );
 };

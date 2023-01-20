@@ -1,25 +1,20 @@
 import React, { useState, useRef } from "react";
 import "./PostShare.css";
 import ImageRoundedIcon from "@mui/icons-material/ImageRounded";
-import PlayCircleFilledRoundedIcon from "@mui/icons-material/PlayCircleFilledRounded";
-import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
-import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
-import { blue, green, purple, red, teal, yellow } from "@mui/material/colors";
-import { Button, Typography } from "@mui/material";
+import { blue } from "@mui/material/colors";
+import { Avatar, Button } from "@mui/material";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import axios from "../../../../../APIs/axios";
+import axios from "../../../../../APIs/UserAPI";
 import Axios from "axios";
-import { useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { user } from "../../../../../Redux/UserSlice";
+import { useSelector } from "react-redux";
 import { DefaultProfile } from "../../../../../Data/DefaultProfile";
 
 const PostShare = ({ getPosts }) => {
   const [img, setImg] = useState("");
   const [formData, setFormData] = useState("");
   const [postData, setPostData] = useState({ image: "", description: "" });
-  const userInfo = useSelector((state) => state.user.user);
+  const userInfo = JSON.parse(localStorage.getItem('user'))
   const imgRef = useRef();
 
   const onImgChange = (file) => {
@@ -87,6 +82,7 @@ const PostShare = ({ getPosts }) => {
       className="postShare"
       style={{ display: "flex", alignItems: "center" }}
     >
+      {/* <div><Avatar src={userInfo.profilePic} alt={`${userInfo.fullName} `}/></div> */}
       {userInfo.profilePic ?
         <div
           style={{

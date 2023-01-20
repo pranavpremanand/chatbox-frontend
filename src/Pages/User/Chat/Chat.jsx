@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { userChats } from "../../../APIs/ChatRequests";
 import LeftSide from "../../../Components/User/Home/LeftSide/LeftSide";
 import RightSide from "../../../Components/User/Home/RightSide/RightSide";
-import axios from "../../../APIs/axios";
+import axios from "../../../APIs/UserAPI";
 import "./Chat.css";
 import Conversation from "../../../Components/User/Chats/Conversation";
 import Chatbox from "../../../Components/User/Chats/Chatbox";
@@ -38,19 +38,19 @@ const Chat = () => {
     }
   }, [sendMessage]);
 
-  //   Receive message from socket server
-  useEffect(() => {
-    // if(receiveMessage!==null){
-    socket.current.on("receive-message", (data) => {
-      console.log(data, "daom recoeve msg");
-      setReceiveMessage(data);
-    });
-    // }
-  }, [socket.current]);
+//   Receive message from socket server
+useEffect(()=>{
+  // if(receiveMessage!==null){
+      socket.current.on('receive-message',(data)=>{
+          setReceiveMessage(data)
+      })
+  // }
+
+},[socket.current])
 
   useEffect(() => {
     setUser(JSON.parse(localStorage.getItem("user")));
-    console.log("mounting");
+    // console.log("mounting");
     getChats();
   }, []);
   const getChats = async () => {

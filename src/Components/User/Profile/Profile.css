@@ -1,11 +1,11 @@
 .img {
   border: 1px solid black;
   /* width: 3rem; */
-  height: 6rem;
+  /* height: 6rem; */
   /* border-radius: 50%; */
-  background-size: cover;
+  /* background-size: cover;
   background-position: center;
-  background-repeat: repeat;
+  background-repeat: repeat; */
 }
 .profileCard {
   border-radius: 1.5rem;
@@ -44,11 +44,11 @@
   justify-content: center;
 }
 .profilePic > .img{
-  width: 6rem;
-  border-radius: 50%;
+  /* width: 6rem; */
+  /* border-radius: 50%; */
   position: absolute;
   bottom: -3rem;
-  box-shadow: var(--profileShadow);
+  /* box-shadow: var(--profileShadow); */
 }
 .dummyImg{
   width: 6rem;

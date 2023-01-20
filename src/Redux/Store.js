@@ -5,6 +5,8 @@ import User from "./UserSlice";
 import Comments from "./CommentsSlice";
 import Photos from "./UserPhotosSlice";
 import Notifications from "./NotificationsSlice";
+import ProfileSlice from "./ProfileSlice";
+import SavedPostsSlice from "./SavedPostsSlice";
 
 const store = configureStore({
   reducer: {
@@ -13,7 +15,9 @@ const store = configureStore({
     user: User,
     comments: Comments,
     photos: Photos,
-    notifications:Notifications
+    notifications: Notifications,
+    profileViewUser: ProfileSlice,
+    savedPosts: SavedPostsSlice,
   },
 });
 

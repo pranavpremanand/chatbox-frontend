@@ -3,38 +3,31 @@ import {
   Avatar,
   Box,
   Button,
-  Divider,
-  FormHelperText,
   Grid,
   Tab,
   Tabs,
   TextField,
   Typography,
 } from "@mui/material";
-import { teal } from "@mui/material/colors";
-import axios from "../../../APIs/axios";
+import userAPI from "../../../APIs/UserAPI";
 import Axios from "axios";
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import { useEffect, useRef } from "react";
 import "./Profile.css";
 import Post from "../Home/PostSide/Posts/Post";
 import { useDispatch, useSelector } from "react-redux";
 import { photos } from "../../../Redux/UserPhotosSlice";
 import DeleteIcon from "@mui/icons-material/Delete";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import PersonIcon from "@mui/icons-material/Person";
-import { DefaultProfile } from "../../../Data/DefaultProfile";
 import EditIcon from "@mui/icons-material/Edit";
-import {
-  // Formik,
-  useFormik,
-} from "formik";
-
-import * as Yup from "yup";
 import { toast } from "react-hot-toast";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import { blue } from "@mui/material/colors";
 
 function Profile() {
-  // const userData = useSelector((state)=>state.user.user)
+  const loggedUserStatus = useSelector((state) => state.profileViewUser.user);
+  const userProfileId = useSelector((state) => state.profileViewUser.userId);
+  const users = useSelector((state) => state.users.users);
+  const currentUser = JSON.parse(localStorage.getItem("user"));
   const [userData, setUserData] = useState({});
   const [profileDetails, setProfileDetails] = useState({
     fullName: userData.fullName,
@@ -49,10 +42,7 @@ function Profile() {
     relationship: "",
     // relationship: userData.relationship,
   });
-  const [formData, setFormData] = useState();
-  const [coverData, setCoverData] = useState();
   const dispatch = useDispatch();
-  const [img, setImg] = useState();
   const allPhotos = useSelector((state) => state.photos.photos);
   const [posts, setPosts] = useState([]);
   const [editOption, setEditOption] = useState(false);
@@ -68,8 +58,8 @@ function Profile() {
     );
     if (response.data) {
       console.log(response.data.secure_url);
-      await axios
-        .post("/api/user/add-profile-pic", {
+      await userAPI
+        .post("/user/add-profile-pic", {
           profilePic: response.data.secure_url,
         })
         .then((response) => {
@@ -83,11 +73,19 @@ function Profile() {
                 color: "#fff",
               },
             });
-            getPosts();
+            getPosts(currentUser._id);
           }
         })
         .catch((err) => {
-          console.log(err);
+          toast("Something went wrong, try again", {
+            icon: "❌",
+            style: {
+              borderRadius: "10px",
+              background: "#333",
+              color: "#fff",
+            },
+          });
+          console.log(err, "ERROR");
         });
     }
   };
@@ -104,13 +102,11 @@ function Profile() {
       data
     );
     if (response.data) {
-      console.log(response.data.secure_url);
-      await axios
-        .post("/api/user/add-cover", { cover: response.data.secure_url })
+      await userAPI
+        .post("/user/add-cover", { cover: response.data.secure_url })
         .then((response) => {
           if (response.data) {
             toast("Cover picture updated", {
-              // icon: "✔",
               icon: "✅",
               style: {
                 borderRadius: "10px",
@@ -118,16 +114,53 @@ function Profile() {
                 color: "#fff",
               },
             });
-            getPosts();
+            getPosts(currentUser._id);
           }
         })
         .catch((err) => {
+          toast("Something went wrong, try again", {
+            icon: "❌",
+            style: {
+              borderRadius: "10px",
+              background: "#333",
+              color: "#fff",
+            },
+          });
           console.log(err);
         });
     }
   };
 
-  const [value, setValue] = React.useState(0);
+  //Send verification request
+  const verifyRequest = async (userId) => {
+    try {
+      const { data } = await userAPI.get(
+        `/user/request-verification/${userId}`
+      );
+      if (data) {
+        toast("Sent verification request", {
+          icon: "✅",
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
+        getPosts(userId);
+      }
+    } catch (err) {
+      toast("Something went wrong, try again", {
+        icon: "❌",
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    }
+  };
+
+  const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -138,21 +171,21 @@ function Profile() {
     about: false,
     photos: false,
   });
+
   useEffect(() => {
-    getPosts();
-    getUserPhotos();
-  }, []);
+    loggedUserStatus ? getPosts(currentUser._id) : getPosts(userProfileId);
+  }, [userProfileId, loggedUserStatus, users]);
 
   //Get user posts
-  const getPosts = () => {
-    axios
-      .get("/user/get-user-posts")
+  const getPosts = (userId) => {
+    userAPI
+      .get(`/user/get-user-posts/${userId}`)
       .then((response) => {
         if (response.data.success) {
-          // console.log(response.data.posts,"PSOTS")
+          getUserPhotos(userId);
+          console.log(response.data.posts, "posts");
           setPosts(response.data.posts);
           setUserData(response.data.user);
-          // dispatch(user({dispatch(user({user:response.data.user}))}))
           setStates({ posts: true, about: false, photos: false });
         }
       })
@@ -161,9 +194,9 @@ function Profile() {
       });
   };
   //Get user photos
-  const getUserPhotos = () => {
-    axios
-      .get("/user/get-user-photos")
+  const getUserPhotos = (userId) => {
+    userAPI
+      .get(`/user/get-user-photos/${userId}`)
       .then((response) => {
         if (response.data.success) {
           dispatch(photos({ photos: response.data.photos }));
@@ -183,15 +216,14 @@ function Profile() {
     });
     setEditOption(false);
     console.log(profileDetails);
-    axios
+    userAPI
       .post("/user/update-profile", profileDetails)
       .then((response) => {
         if (response.data.success) {
-          axios
+          userAPI
             .get("/user/get-user-posts")
             .then((response) => {
               if (response.data.success) {
-                setPosts(response.data.posts);
                 setUserData(response.data.user);
                 setStates({ posts: false, about: true, photos: false });
               }
@@ -205,6 +237,7 @@ function Profile() {
         console.log(err, "ERROR");
       });
   };
+
   return (
     <>
       <div className="profileCard" style={{ marginTop: "1rem" }}>
@@ -218,83 +251,132 @@ function Profile() {
                 })`,
               }}
             ></div>
-            <Box
-              onClick={() => coverPicRef.current.click()}
-              sx={{
-                display: "flex",
-                alignSelf: "flex-end",
-                position: "absolute",
-                bottom: "0",
-                background: "white",
-                padding: "0.3rem",
-                borderRadius: "10px 0 0 0",
-                cursor: "pointer",
-              }}
-            >
-              <CameraAltRounded />
-              <Typography>Edit cover</Typography>
-            </Box>
+            {loggedUserStatus && (
+              <Box
+                onClick={() => coverPicRef.current.click()}
+                sx={{
+                  display: "flex",
+                  alignSelf: "flex-end",
+                  position: "absolute",
+                  bottom: "0",
+                  background: "white",
+                  padding: "0.3rem",
+                  borderRadius: "10px 0 0 0",
+                  cursor: "pointer",
+                }}
+              >
+                <CameraAltRounded />
+                <Typography>Edit cover</Typography>
+              </Box>
+            )}
           </div>
           <div className="profilePic" style={{ position: "relative" }}>
-            {userData.profilePic ? (
-              <img
-                className="img"
-                style={{
-                  backgroundImage: `url(${userData.profilePic})`,
+            <Avatar
+              className="img"
+              sx={{ width: 110, height: 110 }}
+              src={userData.profilePic}
+              alt={userData.fullName}
+            />
+
+            {loggedUserStatus && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "0",
+                  background: "white",
+                  marginTop: "2rem",
+                  marginLeft: "3rem",
+                  borderRadius: "10px",
                 }}
-                alt=""
-              />
-            ) : (
-              <Grid className="img" sx={{ background: "white" }}>
-                <AccountCircleIcon sx={{ fontSize: "6rem" }} />
-              </Grid>
-              // <img
-              //   className="dummyImg"
-              //   style={{
-              //     backgroundImage: `url(${DefaultProfile})`,
-              //   }}
-              //   alt=""
-              // />
+              >
+                <CameraAltRounded
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => profilePicRef.current.click()}
+                />
+              </Box>
             )}
-            <Box
-              sx={{
-                position: "absolute",
-                top: "0",
-                background: "white",
-                marginTop: "2rem",
-                marginLeft: "3rem",
-                borderRadius: "10px",
-              }}
-            >
-              <CameraAltRounded
-                sx={{ cursor: "pointer" }}
-                onClick={() => profilePicRef.current.click()}
-              />
-            </Box>
           </div>
-          {/* <img className="img" src={ProfilePic} alt=''/> */}
         </div>
         <div className="profileName">
-          <Typography sx={{ fontWeight: "bold", fontSize: "large" }}>
-            {userData.fullName}
-          </Typography>
+          <Box sx={{ display: "flex", gap: "0.2rem" }}>
+            <Typography sx={{ fontWeight: "bold", fontSize: "large" }}>
+              {userData.fullName}
+            </Typography>
+            {userData.verifiedUser && (
+              <Box
+                sx={{
+                  background: "white",
+                  backgroundSize: "60%",
+                  color: blue[600],
+                  borderRadius: "50%",
+                }}
+              >
+                <VerifiedIcon fontSize="small" />
+              </Box>
+            )}
+          </Box>
           <Typography sx={{ fontWeight: "medium" }}>
             {userData.about ? userData.about : "Not added"}
           </Typography>
         </div>
+        {userData.followers?.length >= 5 &&
+          !userData.verifiedUser &&
+          !userData.verificationRequest &&
+          currentUser._id === userData._id && (
+            <Grid
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: "small",
+                    alignSelf: "center",
+                  }}
+                >
+                  You may request the admin to make your account verified.
+                </Typography>
+              </Box>
+              <Button
+                onClick={() => verifyRequest(userData._id)}
+                className="text-capitalize"
+                variant="contained"
+                color="primary"
+                size="small"
+              >
+                Verify account
+              </Button>
+            </Grid>
+          )}
         <div className="followStatus">
           {/* <hr /> */}
-          {/* <div>
-          <div className="follow">
-            <Typography sx={{fontWeight:'800'}}>{userData.following ? userData.following.length:0}</Typography>
-            <Typography sx={{fontWeight:'500'}}>Following</Typography>
+          <div>
+            <div className="follow">
+              <Typography sx={{ fontWeight: "800" }}>
+                {userData.following ? userData.following.length : 0}
+              </Typography>
+              <Typography sx={{ fontWeight: "500" }}>Following</Typography>
+            </div>
+            <div className="vl"></div>
+            <div className="follow">
+              <Typography sx={{ fontWeight: "800" }}>
+                {userData.followers ? userData.followers.length : 0}
+              </Typography>
+              <Typography sx={{ fontWeight: "500" }}>Followers</Typography>
+            </div>
           </div>
-          <div className='vl'></div>
-          <div className='follow'>
-            <Typography sx={{fontWeight:'800'}}>{userData.followers ? userData.followers.length:0}</Typography>
-            <Typography sx={{fontWeight:'500'}}>Followers</Typography>
-          </div>
-        </div> */}
           {/* <hr /> */}
           <Box
             sx={{ maxWidth: { xs: 320, sm: 480 }, bgcolor: "background.paper" }}
@@ -309,23 +391,26 @@ function Profile() {
               aria-label="scrollable auto tabs example"
             >
               <Tab
-                onClick={() =>
-                  setStates({ posts: true, about: false, photos: false })
-                }
+                onClick={() => {
+                  setEditOption(false);
+                  setStates({ posts: true, about: false, photos: false });
+                }}
                 sx={{ textTransform: "capitalize" }}
                 label="Posts"
               />
               <Tab
-                onClick={() =>
-                  setStates({ posts: false, about: true, photos: false })
-                }
+                onClick={() => {
+                  setEditOption(false);
+                  setStates({ posts: false, about: true, photos: false });
+                }}
                 sx={{ textTransform: "capitalize" }}
                 label="About"
               />
               <Tab
-                onClick={() =>
-                  setStates({ posts: false, about: false, photos: true })
-                }
+                onClick={() => {
+                  setEditOption(false);
+                  setStates({ posts: false, about: false, photos: true });
+                }}
                 sx={{ textTransform: "capitalize" }}
                 label="Photos"
               />
@@ -364,7 +449,7 @@ function Profile() {
               }}
             >
               <Grid>
-                {!editOption && (
+                {loggedUserStatus && !editOption && (
                   <Box
                     sx={{
                       display: "flex",
@@ -378,7 +463,7 @@ function Profile() {
                     />
                   </Box>
                 )}
-                {!editOption ? (
+                {!loggedUserStatus | !editOption ? (
                   <Box>
                     <Box
                       sx={{
@@ -708,29 +793,32 @@ function Profile() {
               return !post.isDeleted && post.image ? (
                 // <Grid className='col-6'>
                 <Grid
-                  className="col-6"
+                  className="col-12"
                   sx={{
                     border: "2px solid #F0EBEB",
-                    height: "200px",
+                    height: "300px",
+                    minHeight: "300px",
                     margin: "1rem 1rem 1rem",
                     borderRadius: "10px",
                     position: "relative",
-                    width: "200px",
+                    width: "95%",
                     backgroundImage: `url(${post.image})`,
                     backgroundPosition: "center",
                     backgroundSize: "cover",
                     // display: "inline",
                   }}
                 >
-                  <DeleteIcon
-                    sx={{
-                      position: "absolute",
-                      top: "1px",
-                      right: "1px",
-                      cursor: "pointer",
-                      color: "white",
-                    }}
-                  />
+                  {loggedUserStatus && (
+                    <DeleteIcon
+                      sx={{
+                        position: "absolute",
+                        top: "1px",
+                        right: "1px",
+                        cursor: "pointer",
+                        color: "white",
+                      }}
+                    />
+                  )}
                 </Grid>
               ) : // </Grid>
               null;

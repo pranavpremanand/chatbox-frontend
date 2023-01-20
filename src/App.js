@@ -1,4 +1,4 @@
-import { Fragment,useRef } from "react";
+import { Fragment } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -10,16 +10,17 @@ import Home from "./Pages/User/Home/Home";
 import Login from "./Pages/User/Login";
 import Signup from "./Pages/User/Signup";
 import { Toaster } from "react-hot-toast";
-import AdminHome from "./Pages/Admin/AdminHome";
 import AdminProtectedRoute from "./Components/Admin/AdminAuth/AdminProtectedRoute";
 import UserProtectedRoute from "./Components/User/UserAuth/UserProtectedRoute";
 import AdminPublicRoute from "./Components/Admin/AdminAuth/AdminPublicRoute";
 import UserPublicRoute from "./Components/User/UserAuth/UserPublicRoute";
 import { Box } from "@mui/material";
 import ProfilePage from "./Pages/User/Profile/ProfilePage";
-import Messaging from "./Pages/User/Messaging/Messaging";
 import Chat from "./Pages/User/Chat/Chat";
 import Notifications from "./Pages/User/Notifications/Notifications";
+import UsersSide from "./Pages/Admin/UsersSide";
+import ReportedPosts from "./Pages/Admin/ReportedList";
+import SavedPosts from "./Pages/User/SavedPosts/SavedPosts";
 // import { io } from "socket.io-client";
 //   const socket = {}
 //   socket.current = io("http://localhost:8800");
@@ -36,7 +37,9 @@ function App() {
               path="/"
               element={
                 <UserProtectedRoute>
+                  {/* <CheckBlocked> */}
                   <Home />
+                  {/* </CheckBlocked> */}
                 </UserProtectedRoute>
               }
             />
@@ -61,6 +64,14 @@ function App() {
               element={
                 <UserProtectedRoute>
                   <Notifications />
+                </UserProtectedRoute>
+              }
+            />
+            <Route
+              path="/saved-posts"
+              element={
+                <UserProtectedRoute>
+                  <SavedPosts />
                 </UserProtectedRoute>
               }
             />
@@ -90,10 +101,18 @@ function App() {
               }
             />
             <Route
-              path="/admin/home"
+              path="/admin/users"
               element={
                 <AdminProtectedRoute>
-                  <AdminHome />
+                  <UsersSide />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/reported-posts"
+              element={
+                <AdminProtectedRoute>
+                  <ReportedPosts />
                 </AdminProtectedRoute>
               }
             />

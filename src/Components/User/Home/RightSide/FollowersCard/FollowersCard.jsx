@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import "./FollowersCard.css";
 import { Avatar, Box, Button, Typography } from "@mui/material";
-import { purple, teal } from "@mui/material/colors";
-import axios from "../../../../../APIs/axios";
+import axios from "../../../../../APIs/UserAPI";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { Search as SearchIcon } from "@mui/icons-material";
@@ -21,7 +20,7 @@ const FollowersCard = () => {
       .get(`/user/follow-user/${userId}`)
       .then((response) => {
         if (response.data.success) {
-          // followUser(userId)
+          followUser(userId)
           dispatch(user({user:response.data.user}))
           dispatch(followUser({ users: userId }));
           dispatch(followed({ users: response.data.user }));

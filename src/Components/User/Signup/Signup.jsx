@@ -96,7 +96,6 @@ export default function SignUp() {
     onSubmit: (values) => {
       try {
         if (otp === "") {
-          console.log(values);
           axios({
             url: "/user/send-otp",
             method: "post",
@@ -344,7 +343,6 @@ export default function SignUp() {
                   label="Enter OTP sent to your email"
                   fullWidth
                   placeholder="OTP"
-                  // className={classes.textfield}
                 />
               ) : null}
               {otpField ? (

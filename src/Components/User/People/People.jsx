@@ -1,9 +1,10 @@
 import { Tab, Tabs, Box, Avatar, Button, Typography } from "@mui/material";
-import axios from "../../../APIs/axios";
+import axios from "../../../APIs/UserAPI";
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useEffect } from "react";
-import { purple } from "@mui/material/colors";
+import { purple, blue } from "@mui/material/colors";
+import VerifiedIcon from "@mui/icons-material/Verified";
 import { useDispatch, useSelector } from "react-redux";
 import { Search as SearchIcon } from "@mui/icons-material";
 import {
@@ -13,15 +14,19 @@ import {
   others,
   followed,
 } from "../../../Redux/UsersSlice";
-import { user } from "../../../Redux/UserSlice";
+import { useNavigate } from "react-router-dom";
+import { loggedUserStatus, setUserProfile } from "../../../Redux/ProfileSlice";
 
 const People = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   let users = useSelector((state) => state.users.users);
   const [value, setValue] = useState("one");
   const [Followers, setFollowers] = useState([]);
   const [followersTrue, setFollowersTrue] = useState(false);
-  const [searching,setSearching]=useState(false)
+  const [searching, setSearching] = useState(false);
+  const [whotofollow, setWhotofollow] = useState(false);
+  const [searchFollowButtons, setSearchFollowButtons] = useState(false);
 
   useEffect(() => {
     getWhoToFollow();
@@ -32,19 +37,13 @@ const People = () => {
     await axios
       .get("/user/followings")
       .then((response) => {
+        setWhotofollow(false);
         setFollowersTrue(false);
+        setSearchFollowButtons(false);
         dispatch(following({ users: response.data.users[0].result }));
       })
       .catch((err) => {
         console.log(err);
-        // toast("Something went wrong, try again", {
-        //   icon: "❌",
-        //   style: {
-        //     borderRadius: "10px",
-        //     background: "#333",
-        //     color: "#fff",
-        //   },
-        // });
       });
   };
 
@@ -53,7 +52,10 @@ const People = () => {
     await axios
       .get("/user/followers")
       .then((response) => {
+        setWhotofollow(false);
         setFollowersTrue(true);
+        setSearching(false);
+        setSearchFollowButtons(false);
         setFollowers(response.data.users[0].result);
       })
       .catch((err) => {
@@ -61,21 +63,24 @@ const People = () => {
       });
   };
 
-    //Search user
-    const searchUser = async (text) => {
-      try {
-        if (text === "") {
-          getWhoToFollow();
-        } else {
-          setSearching(true)
-          const { data } = await axios.get("/user/search-user/" + text);
-          setFollowersTrue(true)
-          setFollowers(data)
-        }
-      } catch (err) {
-        console.log(err);
+  //Search user
+  const searchUser = async (text) => {
+    try {
+      if (text === "") {
+        getWhoToFollow();
+        setSearching(false);
+      } else {
+        setSearching(true);
+        setSearchFollowButtons(true);
+        const { data } = await axios.get("/user/search-user/" + text);
+        // console.log("USERS SEARCH", users)
+        setFollowersTrue(true);
+        setFollowers(data);
       }
-    };
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   //Get others
   const getWhoToFollow = () => {
@@ -83,6 +88,8 @@ const People = () => {
       .get("/user/who-to-follow")
       .then((response) => {
         if (response.data.success) {
+          setSearching(false);
+          setWhotofollow(true);
           setFollowersTrue(false);
           dispatch(others({ users: response.data.users }));
         }
@@ -154,21 +161,29 @@ const People = () => {
     setValue(newValue);
   };
 
+  const setProfile = (userId) => {
+    dispatch(loggedUserStatus(false));
+    dispatch(setUserProfile(userId));
+    navigate("/profile");
+  };
+
   return (
     <div>
       <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
-        <Box
-          className="search"
-          sx={{ background: "white", display: "flex", marginBottom: "1rem" }}
-        >
-          <input
-            onChange={(e) => searchUser(e.target.value)}
-            type="text"
-            placeholder="Search"
-            style={{ width: "100%" }}
-          ></input>
-          <SearchIcon className="s-icon" />
-        </Box>
+        {whotofollow && (
+          <Box
+            className="search"
+            sx={{ background: "white", display: "flex", marginBottom: "1rem" }}
+          >
+            <input
+              onChange={(e) => searchUser(e.target.value)}
+              type="text"
+              placeholder="Search"
+              style={{ width: "100%" }}
+            ></input>
+            <SearchIcon className="s-icon" />
+          </Box>
+        )}
         <Tabs
           value={value}
           onChange={handleChange}
@@ -196,135 +211,44 @@ const People = () => {
           />
         </Tabs>
         <Box>
-          {
-            searching&&
-            followersTrue
-              ? Followers.map((val) => {
-                  return (
-                    <Box className="follower" sx={{ margin: "0.5rem" }}>
-                      <div>
-                        {val.profilePic ? (
-                          <img
-                            src={val.profilePic}
-                            alt=""
-                            className="followerImg"
-                          />
-                        ) : (
-                          <div
-                            className="profile"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              padding: "10px",
-                            }}
-                          >
-                            <Avatar
-                              sx={{
-                                fontSize: "30px",
-                                alignSelf: "center",
-                                // background: "grey",
-                                borderRadius: "50%",
-                                color: "white",
-                              }}
-                            />
-                          </div>
-                        )}
-  
-                        <Box className="name">
+          {searching | followersTrue
+            ? Followers.map((val) => {
+                return (
+                  <Box className="follower" sx={{ margin: "0.5rem" }}>
+                    <Box
+                      sx={{ cursor: "pointer" }}
+                      onClick={() => setProfile(val._id)}
+                    >
+                      <Avatar
+                        sx={{ width: 45, height: 45 }}
+                        src={val.profilePic}
+                        alt={` ${val.fullName}`}
+                      />
+                      <Box className="name">
+                      <Box sx={{ display: "flex", gap: "0.2rem",alignItems:'center' }}>
                           <Typography sx={{ fontSize: "", fontWeight: "bold" }}>
                             {val.fullName}
                           </Typography>
-                          <Typography sx={{ fontSize: "" }}>
-                            {val.username}
-                          </Typography>
+                          {val.verifiedUser && (
+                            <VerifiedIcon
+                              sx={{ color: blue[600] }}
+                              color={blue[600]}
+                              fontSize="xsmall"
+                            />
+                          )}
                         </Box>
-                      </div>
-                      {/* {val.isFollowed ? (
-                        <Button
-                          onClick={() => {
-                            unfollow(val._id);
-                          }}
-                          size="small"
-                          sx={{
-                            backgroundColor: "black",
-                            color: "white",
-                            borderRadius: "50%",
-                            fontSize: "small",
-                          }}
-                          className="button btn-sm fc-button text-capitalize"
-                        >
-                          Unfollow
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => follow(val._id)}
-                          size="small"
-                          sx={{
-                            backgroundColor: "black",
-                            color: "white",
-                            borderRadius: "50%",
-                            fontSize: "small",
-                          }}
-                          className="button btn-sm fc-button text-capitalize"
-                        >
-                          Follow
-                        </Button> */}
-                      {/* )} */}
+                        <Typography sx={{ fontSize: "" }}>
+                          {val.username}
+                        </Typography>
+                      </Box>
                     </Box>
-                  );
-                })
-              : users.map((val) => {
-                  return (
-                    <Box className="follower" sx={{ margin: "0.5rem" }}>
-                      <div>
-                        {val.profilePic ? (
-                          <img
-                            src={val.profilePic}
-                            alt=""
-                            className="followerImg"
-                          />
-                        ) : (
-                          <div
-                            className="profile"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              padding: "10px",
-                            }}
-                          >
-                            <Avatar
-                              sx={{
-                                fontSize: "30px",
-                                alignSelf: "center",
-                                // background: "grey",
-                                borderRadius: "50%",
-                                color: "white",
-                              }}
-                            />
-                          </div>
-                        )}
-  
-                        <Box className="name">
-                          <Typography sx={{ fontSize: "", fontWeight: "bold" }}>
-                            {val.fullName}
-                          </Typography>
-                          <Typography sx={{ fontSize: "" }}>
-                            {val.username}
-                          </Typography>
-                        </Box>
-                      </div>
-                      {val.isFollowed ? (
+                    {searching && searchFollowButtons ? (
+                      val.isFollowed ? (
                         <Button
                           onClick={() => {
                             unfollow(val._id);
                           }}
                           size="small"
-                          sx={{
-                            // backgroundColor: "black",
-                            // color: "white",
-                            borderRadius: "50%",
-                            // fontSize: "small",
-                          }}
                           variant="contained"
                           color="info"
                           className="text-capitalize"
@@ -335,23 +259,74 @@ const People = () => {
                         <Button
                           onClick={() => follow(val._id)}
                           size="small"
-                          sx={{
-                            // backgroundColor: "black",
-                            // color: "white",
-                            borderRadius: "50%",
-                            // fontSize: "small",
-                          }}
                           variant="contained"
                           color="info"
                           className="text-capitalize"
                         >
                           Follow
                         </Button>
-                      )}
+                      )
+                    ) : null}
+                  </Box>
+                );
+              })
+            : users.map((val) => {
+                return (
+                  <Box className="follower" sx={{ margin: "0.8rem" }}>
+                    <Box
+                      sx={{ cursor: "pointer" }}
+                      onClick={() => setProfile(val._id)}
+                    >
+                      <Avatar
+                        sx={{ width: 45, height: 45 }}
+                        src={val.profilePic}
+                        alt={` ${val.fullName}`}
+                      />
+
+                      <Box className="name">
+                        <Box sx={{ display: "flex", gap: "0.2rem",alignItems:'center' }}>
+                          <Typography sx={{ fontSize: "", fontWeight: "bold" }}>
+                            {val.fullName}
+                          </Typography>
+                          {val.verifiedUser && (
+                            <VerifiedIcon
+                              sx={{ color: blue[600] }}
+                              color={blue[600]}
+                              fontSize="xsmall"
+                            />
+                          )}
+                        </Box>
+                        <Typography sx={{ fontSize: "" }}>
+                          {val.username}
+                        </Typography>
+                      </Box>
                     </Box>
-                  );
-                })}
-          
+                    {val.isFollowed ? (
+                      <Button
+                        onClick={() => {
+                          unfollow(val._id);
+                        }}
+                        size="small"
+                        variant="contained"
+                        color="info"
+                        className="text-capitalize"
+                      >
+                        Unfollow
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => follow(val._id)}
+                        size="small"
+                        variant="contained"
+                        color="info"
+                        className="text-capitalize"
+                      >
+                        Follow
+                      </Button>
+                    )}
+                  </Box>
+                );
+              })}
         </Box>
       </Box>
     </div>

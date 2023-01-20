@@ -1,10 +1,10 @@
 import { Avatar, Box, Button, Typography } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
-import axios from "../../../APIs/axios";
+import React, { useEffect, useState } from "react";
+import axios from "../../../APIs/UserAPI";
 import TimeAgo from "javascript-time-ago";
 import InputEmoji from "react-input-emoji";
-import en from "javascript-time-ago/locale/en";
 import { Send } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 // TimeAgo.addDefaultLocale(en);
 const Chatbox = ({ receiveMessage, setSendMessage, chat, currentUserId }) => {
@@ -12,6 +12,7 @@ const Chatbox = ({ receiveMessage, setSendMessage, chat, currentUserId }) => {
   const [userData, setUserData] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const navigate = useNavigate();
   //   const scroll = useRef()
 
   useEffect(() => {
@@ -30,7 +31,6 @@ const Chatbox = ({ receiveMessage, setSendMessage, chat, currentUserId }) => {
         .get("/user/get-user/" + userId)
         .then((response) => {
           setUserData(response.data);
-          console.log(response.data);
         })
         .catch((err) => {
           console.log(err);
@@ -108,7 +108,7 @@ const Chatbox = ({ receiveMessage, setSendMessage, chat, currentUserId }) => {
           flexDirection: "column",
           padding: "1rem",
           borderRadius: "10px",
-          backgroundColor:'beige',
+          backgroundColor: "beige",
         }}
       >
         {chat ? (
@@ -239,9 +239,13 @@ const Chatbox = ({ receiveMessage, setSendMessage, chat, currentUserId }) => {
                 onClick={handleSend}
                 variant="contained"
                 color="secondary"
+                size="small"
               >
                 <Send />
               </Button>
+              {/* <IconButton color="secondary">
+                <Send />
+              </IconButton> */}
             </div>
           </>
         ) : (
