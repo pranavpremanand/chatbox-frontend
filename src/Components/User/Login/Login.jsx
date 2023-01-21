@@ -29,6 +29,7 @@ import {
 import { changePassword, user } from "../../../Redux/UserSlice";
 import { useDispatch } from "react-redux";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
+import APIuser from "../../../APIs/userAPI";
 
 const style = {
   position: "absolute",
@@ -86,7 +87,7 @@ function Login() {
     onSubmit: async (values) => {
       try {
         if (otp === "") {
-          const response = await axios.post("/user/otp-login", values);
+          const response = await APIuser.post("/user/otp-login", values);
           if (response.data.message === "OTP sent") {
             toast("OTP sent to your email", {
               icon: "✅",
@@ -143,7 +144,7 @@ function Login() {
     onSubmit: (values) => {
       // login(values);
       try {
-        axios.post("/user/login",values)
+        APIuser.post( "/user/login",values)
         .then((response) => {
             if (response.data.success) {
               if (response.data.otpLoginSuccess) {

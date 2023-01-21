@@ -1,7 +1,7 @@
 import { ImageList } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import userAPI from "../../../APIs/UserAPI";
+import userAPI from "../../../APIs/UserAuthAPI";
 import LeftSide from "../../../Components/User/Home/LeftSide/LeftSide";
 import RightSide from "../../../Components/User/Home/RightSide/RightSide";
 import SavedPost from "../../../Components/User/SavedPost/SavedPost";

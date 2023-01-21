@@ -1,7 +1,7 @@
 import { Avatar, styled, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
-import axios from "../../../APIs/UserAPI";
+import axios from "../../../APIs/UserAuthAPI";
 import Badge from "@mui/material/Badge";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({

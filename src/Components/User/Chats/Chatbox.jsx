@@ -1,6 +1,6 @@
 import { Avatar, Box, Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import axios from "../../../APIs/UserAPI";
+import axios from "../../../APIs/UserAuthAPI";
 import TimeAgo from "javascript-time-ago";
 import InputEmoji from "react-input-emoji";
 import { Send } from "@mui/icons-material";

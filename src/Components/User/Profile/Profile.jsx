@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import userAPI from "../../../APIs/UserAPI";
+import userAPI from "../../../APIs/UserAuthAPI";
 import Axios from "axios";
 import React, { useState } from "react";
 import { useEffect, useRef } from "react";

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "../../../APIs/UserAPI";
+import axios from "../../../APIs/UserAuthAPI";
 // import axios from 'axios'
 import "./Home.css";
 import {
@@ -26,7 +26,7 @@ import {
   useFormik,
   // Formik
 } from "formik";
-import userAPI from "../../../APIs/UserAPI";
+import userAPI from "../../../APIs/UserAuthAPI";
 import { toast } from "react-hot-toast";
 import { setSavedPosts } from "../../../Redux/SavedPostsSlice";
 

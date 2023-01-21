@@ -32,7 +32,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { useState } from "react";
-import UserAPI from "../../../../../APIs/UserAPI";
+import UserAPI from "../../../../../APIs/UserAuthAPI";
 import { toast } from "react-hot-toast";
 import {
   postDelete,
@@ -48,7 +48,7 @@ import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 // English.
 import en from "javascript-time-ago/locale/en";
 import { useNavigate } from "react-router-dom";
-import userAPI from "../../../../../APIs/UserAPI";
+// import userAPI from "../../../../../APIs/UserAuthAPI";
 import {
   loggedUserStatus,
   setUserProfile,
@@ -212,7 +212,7 @@ const Post = ({ data, getPosts }) => {
   //Report post
   const reportPost = async (postId) => {
     try {
-      const response = await userAPI.post(`/user/report-post`, {
+      const response = await UserAPI.post(`/user/report-post`, {
         postId: postId,
         userId: currentUser,
         reportType: reportType,
@@ -251,7 +251,7 @@ const Post = ({ data, getPosts }) => {
 
   const savePost = async (postId) => {
     try {
-      const { data } = await userAPI.get(`/user/save-post/${postId}`);
+      const { data } = await UserAPI.get(`/user/save-post/${postId}`);
       if (data) {
         getPosts();
       }

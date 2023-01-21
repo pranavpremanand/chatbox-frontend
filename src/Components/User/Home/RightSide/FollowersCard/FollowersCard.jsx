@@ -1,7 +1,7 @@
 import React from "react";
 import "./FollowersCard.css";
 import { Avatar, Box, Button, Typography } from "@mui/material";
-import axios from "../../../../../APIs/UserAPI";
+import axios from "../../../../../APIs/UserAuthAPI";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { Search as SearchIcon } from "@mui/icons-material";

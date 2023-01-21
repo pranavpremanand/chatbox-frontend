@@ -7,7 +7,7 @@ import RightSide from "../../../Components/User/Home/RightSide/RightSide";
 import NotificationsList from "../../../Components/User/Notifications/NotificationsList";
 import { user } from "../../../Redux/UserSlice";
 import "./Notifications.css";
-import axios from "../../../APIs/UserAPI";
+import axios from "../../../APIs/UserAuthAPI";
 
 const Notifications = () => {
   const dispatch = useDispatch();

@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { userChats } from "../../../APIs/ChatRequests";
 import LeftSide from "../../../Components/User/Home/LeftSide/LeftSide";
 import RightSide from "../../../Components/User/Home/RightSide/RightSide";
-import axios from "../../../APIs/UserAPI";
+import axios from "../../../APIs/UserAuthAPI";
 import "./Chat.css";
 import Conversation from "../../../Components/User/Chats/Conversation";
 import Chatbox from "../../../Components/User/Chats/Chatbox";
@@ -19,7 +19,8 @@ const Chat = () => {
   const [sendMessage, setSendMessage] = useState(null);
   const [receiveMessage, setReceiveMessage] = useState(null);
   // const socket = useRef();
-  const socket = io.connect(process.env.REACT_APP_BASE_URL)
+  const socket = io.connect('https://chatbox.playonsports.shop')
+  // const socket = io.connect('http://localhost:5000')
   //   socket.current = io("http://localhost:8800");
 
   //Sending message to socket server

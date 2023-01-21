@@ -1,5 +1,5 @@
 import { Tab, Tabs, Box, Avatar, Button, Typography } from "@mui/material";
-import axios from "../../../APIs/UserAPI";
+import axios from "../../../APIs/UserAuthAPI";
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useEffect } from "react";

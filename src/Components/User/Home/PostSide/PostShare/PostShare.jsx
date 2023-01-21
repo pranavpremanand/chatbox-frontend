@@ -4,7 +4,7 @@ import ImageRoundedIcon from "@mui/icons-material/ImageRounded";
 import { blue } from "@mui/material/colors";
 import { Avatar, Button } from "@mui/material";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import axios from "../../../../../APIs/UserAPI";
+import axios from "../../../../../APIs/UserAuthAPI";
 import Axios from "axios";
 import { toast } from "react-hot-toast";
 
