@@ -14,7 +14,7 @@ const SavedPost = ({post}) => {
     }
   return (
     // <ImageList sx={{ width: 'auto', maxHeight: '100vh',overflow:'scroll', marginTop:'1rem'}}>
-    <Box sx={{width:'45%',marginBottom:'0.5rem',}}>
+    <Box sx={{width:'48%',marginBottom:'0.5rem',}}>
     <ImageListItem sx={{marginTop:'1rem'}} key="Subheader" cols={2}>
       <ListSubheader component="div" sx={{fontSize:'medium'}}>{post.userId?.fullName}</ListSubheader>
     </ImageListItem>

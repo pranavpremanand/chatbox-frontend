@@ -174,7 +174,7 @@ function Profile() {
 
   useEffect(() => {
     loggedUserStatus ? getPosts(currentUser._id) : getPosts(userProfileId);
-  }, [userProfileId, loggedUserStatus, users]);
+  }, [userProfileId, loggedUserStatus, users,]);
 
   //Get user posts
   const getPosts = (userId) => {
@@ -183,7 +183,6 @@ function Profile() {
       .then((response) => {
         if (response.data.success) {
           getUserPhotos(userId);
-          console.log(response.data.posts, "posts");
           setPosts(response.data.posts);
           setUserData(response.data.user);
           setStates({ posts: true, about: false, photos: false });
@@ -214,16 +213,18 @@ function Profile() {
       username: username,
       fullName: fullName,
     });
+
     setEditOption(false);
-    console.log(profileDetails);
+
     userAPI
       .post("/user/update-profile", profileDetails)
       .then((response) => {
         if (response.data.success) {
           userAPI
-            .get("/user/get-user-posts")
+            .get("/user/get-user-posts/"+currentUser._id)
             .then((response) => {
               if (response.data.success) {
+                setPosts(response.data.posts);
                 setUserData(response.data.user);
                 setStates({ posts: false, about: true, photos: false });
               }
@@ -273,7 +274,7 @@ function Profile() {
           <div className="profilePic" style={{ position: "relative" }}>
             <Avatar
               className="img"
-              sx={{ width: 110, height: 110 }}
+              sx={{ width: 90, height: 90 }}
               src={userData.profilePic}
               alt={userData.fullName}
             />
@@ -298,23 +299,20 @@ function Profile() {
           </div>
         </div>
         <div className="profileName">
-          <Box sx={{ display: "flex", gap: "0.2rem" }}>
-            <Typography sx={{ fontWeight: "bold", fontSize: "large" }}>
-              {userData.fullName}
-            </Typography>
+          <Typography
+            sx={{
+              fontWeight: "bold",
+              fontSize: "large",
+              display: "flex",
+              gap: "0.2rem",
+              alignItems: "center",
+            }}
+          >
+            {userData.fullName}
             {userData.verifiedUser && (
-              <Box
-                sx={{
-                  background: "white",
-                  backgroundSize: "60%",
-                  color: blue[600],
-                  borderRadius: "50%",
-                }}
-              >
-                <VerifiedIcon fontSize="small" />
-              </Box>
+              <VerifiedIcon sx={{ color: blue[500], fontSize: "large" }} />
             )}
-          </Box>
+          </Typography>
           <Typography sx={{ fontWeight: "medium" }}>
             {userData.about ? userData.about : "Not added"}
           </Typography>
@@ -346,7 +344,7 @@ function Profile() {
                     alignSelf: "center",
                   }}
                 >
-                  You may request the admin to make your account verified.
+                  You can now request to make your account to be verified.
                 </Typography>
               </Box>
               <Button
@@ -365,14 +363,14 @@ function Profile() {
           <div>
             <div className="follow">
               <Typography sx={{ fontWeight: "800" }}>
-                {userData.following ? userData.following.length : 0}
+                {userData.following ? userData.following.length-1 : 0}
               </Typography>
               <Typography sx={{ fontWeight: "500" }}>Following</Typography>
             </div>
             <div className="vl"></div>
             <div className="follow">
               <Typography sx={{ fontWeight: "800" }}>
-                {userData.followers ? userData.followers.length : 0}
+                {userData.followers ? userData.followers.length-1 : 0}
               </Typography>
               <Typography sx={{ fontWeight: "500" }}>Followers</Typography>
             </div>
@@ -608,6 +606,7 @@ function Profile() {
                         Username
                       </Typography>
                       <TextField
+                      disabled
                         // onChange={formik.handleChange}
                         onChange={(e) =>
                           setProfileDetails({ username: e.target.value })

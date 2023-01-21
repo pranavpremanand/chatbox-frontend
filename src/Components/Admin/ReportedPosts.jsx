@@ -56,7 +56,6 @@ const ReportedPosts = () => {
     try {
       const { data } = await adminAPI.get("/admin/reported-posts");
       setPosts(data);
-      console.log(data, "DATA");
     } catch (err) {
       console.log(err);
     }

@@ -17,7 +17,6 @@ import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import { loggedUser, loggedUserStatus } from "../../../Redux/ProfileSlice";
 
 const Options = () => {
-  // const profileViewUser = useSelector((state)=>state.profileViewUser.user)
   const dispatch = useDispatch();
   const user = JSON.parse(localStorage.getItem('user'))
   const notifications = user?.unseenNotifications.filter((val)=>val.userId!==user._id)

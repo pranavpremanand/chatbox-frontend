@@ -9,6 +9,11 @@ import {
   Avatar,
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   Fade,
   FormControl,
@@ -67,10 +72,12 @@ const style = {
   p: 4,
 };
 
-const Post = ({ data, liked, getPosts }) => {
+const Post = ({ data, getPosts }) => {
   const timeAgo = new TimeAgo("en-US");
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [liked, setLiked] = useState(data.isLiked);
+  const [likesCount, setLikeCount] = useState(data.posts.likedUsers.length);
   const currentUser = useSelector((state) => state.user.user._id);
   const commentsData = useSelector((state) => state.comments.comments);
   const navigate = useNavigate();
@@ -79,7 +86,9 @@ const Post = ({ data, liked, getPosts }) => {
   const [openModal, setOpenModal] = useState(false);
   const [reportType, setReportType] = useState("");
   const reportedPosts = useSelector((state) => state.posts.reportedPosts);
-  const savedPosts = useSelector((state)=>state.savedPosts.savedPosts)
+  const savedPosts = useSelector((state) => state.savedPosts.savedPosts);
+  const [postDeletion,setPostDeletion] = useState(false)
+  const [deletePostId,setDeletePostId] = useState(null)
 
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -90,12 +99,13 @@ const Post = ({ data, liked, getPosts }) => {
   };
 
   // Delete post
-  const deletePost = (id) => {
-    UserAPI.get(`/user/delete-post/${id}`)
+  const deletePost = () => {
+    UserAPI.get(`/user/delete-post/${deletePostId}`)
       .then((response) => {
         if (response.data.success) {
           getPosts();
-          dispatch(postDelete({ posts: id }));
+          dispatch(postDelete({ posts: deletePostId }));
+          setDeletePostId(null)
           toast(response.data.message, {
             icon: "✅",
             style: {
@@ -129,6 +139,8 @@ const Post = ({ data, liked, getPosts }) => {
   };
 
   const like = (postId) => {
+    liked ? setLikeCount((prev) => prev - 1) : setLikeCount((prev) => prev + 1);
+    setLiked((prev) => !prev);
     UserAPI.get("/user/like-post/" + postId)
       .then((response) => {
         if (response.data.success) {
@@ -136,11 +148,9 @@ const Post = ({ data, liked, getPosts }) => {
           if (response.data.liked) {
             dispatch(likePost({ postId: postId, userId: currentUser }));
             data.posts.likedUsers.length++;
-            // setLikeCount(likeCount + 1);
           } else if (response.data.unliked) {
             data.posts.likedUsers.length--;
             dispatch(unlikePost({ postId: postId, userId: currentUser }));
-            // setLikeCount(likeCount - 1);
           }
         }
       })
@@ -173,10 +183,7 @@ const Post = ({ data, liked, getPosts }) => {
       .then((response) => {
         if (response.data.success) {
           const commentsDetails = response.data.comments.comments;
-          console.log(commentsDetails, "comments");
-          // dispatch(nullComments())
           dispatch(allComments({ comments: commentsDetails }));
-          // setComments(response.data.comments.comments);
         }
       })
       .catch((err) => {
@@ -245,8 +252,8 @@ const Post = ({ data, liked, getPosts }) => {
   const savePost = async (postId) => {
     try {
       const { data } = await userAPI.get(`/user/save-post/${postId}`);
-      if(data){
-        getPosts()
+      if (data) {
+        getPosts();
       }
     } catch (err) {
       toast("Something went wrong, try again", {
@@ -376,7 +383,7 @@ const Post = ({ data, liked, getPosts }) => {
           >
             {currentUser === data._id && (
               <MenuItem
-                onClick={() => deletePost(data.posts._id)}
+                onClick={() => {setPostDeletion(true);setDeletePostId(data.posts._id);}}
                 sx={{ display: "flex", justifyContent: "space-between" }}
               >
                 <DeleteIcon sx={{ mr: 5 }} /> <Typography>Delete</Typography>
@@ -393,21 +400,22 @@ const Post = ({ data, liked, getPosts }) => {
                 </MenuItem>
               )}
             <Divider />
-            {!savedPosts.some((postData)=>postData.post._id===data.posts._id) ? (
-            <MenuItem
-              onClick={() => savePost(data.posts._id)}
-              sx={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <BookmarkBorderIcon sx={{ mr: 5 }} />{" "}
-              <Typography>Save</Typography>
-            </MenuItem>
-             ) : (
+            {!savedPosts.some(
+              (postData) => postData.post._id === data.posts._id
+            ) ? (
               <MenuItem
                 onClick={() => savePost(data.posts._id)}
                 sx={{ display: "flex", justifyContent: "space-between" }}
               >
-                <BookmarkIcon sx={{ mr: 5 }} />{" "}
-                <Typography>Unsave</Typography>
+                <BookmarkBorderIcon sx={{ mr: 5 }} />{" "}
+                <Typography>Save</Typography>
+              </MenuItem>
+            ) : (
+              <MenuItem
+                onClick={() => savePost(data.posts._id)}
+                sx={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <BookmarkIcon sx={{ mr: 5 }} /> <Typography>Unsave</Typography>
               </MenuItem>
             )}
           </Menu>
@@ -436,9 +444,11 @@ const Post = ({ data, liked, getPosts }) => {
               >
                 <FavoriteIcon sx={{ color: red[500] }} />
                 <Typography>
-                  {data.posts.likedUsers.length === 0
+                  {likesCount === 0
                     ? null
-                    : data.posts.likedUsers.length + " Likes"}
+                    : likesCount === 1
+                    ? likesCount + " Like"
+                    : likesCount + " Likes"}
                 </Typography>
               </Box>
             ) : (
@@ -450,9 +460,11 @@ const Post = ({ data, liked, getPosts }) => {
               >
                 <FavoriteBorderIcon />
                 <Typography>
-                  {data.posts.likedUsers.length === 0
+                  {likesCount === 0
                     ? null
-                    : data.posts.likedUsers.length + " Likes"}
+                    : likesCount === 1
+                    ? likesCount + " Like"
+                    : likesCount + " Likes"}
                 </Typography>
               </Box>
             )}
@@ -623,6 +635,38 @@ const Post = ({ data, liked, getPosts }) => {
           </Box>
         </Fade>
       </Modal>
+
+      <Dialog
+        open={postDeletion}
+        onClose={() => setPostDeletion(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Delete post"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Do you really want to delete the post?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            className="text-capitalize"
+            variant="contained"
+            color="error"
+            onClick={() => deletePost()}
+          >
+            Delete
+          </Button>
+          <Button
+            className="text-capitalize"
+            variant="outlined"
+            color="primary"
+            onClick={() => setPostDeletion(false)}
+          >
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

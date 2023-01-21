@@ -18,35 +18,36 @@ const Chat = () => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [sendMessage, setSendMessage] = useState(null);
   const [receiveMessage, setReceiveMessage] = useState(null);
-  const socket = useRef();
+  // const socket = useRef();
+  const socket = io.connect(process.env.REACT_APP_BASE_URL)
   //   socket.current = io("http://localhost:8800");
 
   //Sending message to socket server
   useEffect(() => {
-    console.log("mounting...");
-    socket.current = io("http://localhost:8800");
-    user && socket.current.emit("new-user-add", user?._id);
-    socket.current.on("get-users", (users) => {
+    // console.log("mounting...");
+    // socket.current = io("http://localhost:5000");
+    user && socket.emit("new-user-add", user?._id);
+    socket.on("get-users", (users) => {
       setOnlineUsers(users);
     });
-    return console.log("unmounting");
+    // return console.log("unmounting");
   }, [user]);
 
   useEffect(() => {
     if (sendMessage !== null) {
-      socket.current.emit("send-message", sendMessage);
+      socket.emit("send-message", sendMessage);
     }
   }, [sendMessage]);
 
 //   Receive message from socket server
 useEffect(()=>{
   // if(receiveMessage!==null){
-      socket.current.on('receive-message',(data)=>{
+      socket.on('receive-message',(data)=>{
           setReceiveMessage(data)
       })
   // }
 
-},[socket.current])
+},[socket])
 
   useEffect(() => {
     setUser(JSON.parse(localStorage.getItem("user")));

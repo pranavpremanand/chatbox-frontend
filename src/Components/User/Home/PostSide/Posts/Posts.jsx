@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "./Posts.css";
-// import { PostData } from "../../../../../Data/PostData";
 import Post from "./Post";
 import { useSelector } from "react-redux";
 
@@ -19,7 +18,6 @@ const Posts = ({ getPosts }) => {
                 <Post
                   getPosts={getPosts}
                   data={post}
-                  liked={post.isLiked}
                 />
               )
             );

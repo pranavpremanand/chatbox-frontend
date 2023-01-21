@@ -7,26 +7,39 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import axios from "../../../../../APIs/UserAPI";
 import Axios from "axios";
 import { toast } from "react-hot-toast";
-import { useSelector } from "react-redux";
-import { DefaultProfile } from "../../../../../Data/DefaultProfile";
 
 const PostShare = ({ getPosts }) => {
   const [img, setImg] = useState("");
   const [formData, setFormData] = useState("");
   const [postData, setPostData] = useState({ image: "", description: "" });
-  const userInfo = JSON.parse(localStorage.getItem('user'))
+  const userInfo = JSON.parse(localStorage.getItem("user"));
   const imgRef = useRef();
 
   const onImgChange = (file) => {
-    console.log("file", file.target.files[0]);
     const fData = new FormData();
     fData.append("file", file.target.files[0]);
     fData.append("upload_preset", "aiaeajln");
-    console.log("HEYY", fData);
     setFormData(fData);
     if (file.target.files && file.target.files[0]) {
-      let image = file.target.files[0];
-      setImg({ image: URL.createObjectURL(image) });
+      if (
+        file.target.files[0].type === "image/x-png" ||
+        file.target.files[0].type === "image/gif" ||
+        file.target.files[0].type === "image/jpeg" ||
+        file.target.files[0].type === "image/jpg"
+      ) {
+        let img = file.target.files[0];
+        setImg({ image: URL.createObjectURL(img) });
+      } else {
+        toast("Select an image file", {
+          icon: "❌",
+          position: "top-center",
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
+      }
     }
   };
 
@@ -41,40 +54,43 @@ const PostShare = ({ getPosts }) => {
       if (response.data) {
         image = response.data.secure_url;
       }
-    }
-    await axios
-      .post("/user/upload-post", { postData, image })
-      .then((response) => {
-        toast("Post uploaded", {
-          // icon: "✔",
-          icon: "✅",
-          style: {
-            borderRadius: "10px",
-            background: "#333",
-            color: "#fff",
-          },
-        });
-        console.log("USERSINFO", userInfo);
-        const posts = {
-          description: postData.description,
-          image: image,
-          likedUsers: [],
-        };
-        // dispatch(postsNull())
-        getPosts();
-        setImg(null);
-        setPostData({ description: "" });
-      })
-      .catch((err) =>
-        toast("Something went wrong, try again", {
-          icon: "❌",
-          style: {
-            borderRadius: "10px",
-            background: "#333",
-            color: "#fff",
-          },
+
+      await axios
+        .post("/user/upload-post", { postData, image })
+        .then(() => {
+          toast("Post uploaded", {
+            icon: "✅",
+            style: {
+              borderRadius: "10px",
+              background: "#333",
+              color: "#fff",
+            },
+          });
+          getPosts();
+          setImg(null);
+          setPostData({ description: "" });
         })
-      );
+        .catch((err) =>
+          toast("Something went wrong, try again", {
+            icon: "❌",
+            style: {
+              borderRadius: "10px",
+              background: "#333",
+              color: "#fff",
+            },
+          })
+        );
+    } else {
+      toast("Select a picture to post", {
+        icon: "❌",
+        position: "top-center",
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    }
   };
 
   return (
@@ -82,20 +98,18 @@ const PostShare = ({ getPosts }) => {
       className="postShare"
       style={{ display: "flex", alignItems: "center" }}
     >
-      {/* <div><Avatar src={userInfo.profilePic} alt={`${userInfo.fullName} `}/></div> */}
-      {userInfo.profilePic ?
-        <div
-          style={{
-            backgroundImage: `url(${userInfo.profilePic})`,
-            width: "3.5rem",
-            height: "3.5rem",
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-            borderRadius: "50%",
-          }}
-        ></div>:
-        <img src={DefaultProfile} alt="" />
-      }
+      <div
+        style={{
+          width: "3.5rem",
+          height: "3.5rem",
+        }}
+      >
+        <Avatar
+          sx={{ width: "3.5rem", height: "3.5rem" }}
+          src={userInfo.profilePic}
+          alt={`${userInfo.fullName} `}
+        />
+      </div>
       <div>
         <div
           style={{
@@ -105,63 +119,38 @@ const PostShare = ({ getPosts }) => {
           }}
         >
           <input
-            onChange={(e) => setPostData({ description: e.target.value })}
+            onChange={(e) =>
+              img &&
+              e.target.value !== " " &&
+              setPostData({ description: e.target.value })
+            }
             type="text"
-            placeholder="What's happening..."
+            placeholder="Type something about your post..."
             value={postData.description}
           />
           <div
             className="postOptions"
             style={{ display: "flex", flexDirection: "column" }}
           >
-            <Button onClick={() => imgRef.current.click()}
-                sx={{
-                  // color: purple[600],
-                  backgroundColor: blue[600],
-                  fontSize: "small",
-                  marginBottom: "1rem"
-                }}
-                size='small'
-                variant='contained'
-                startIcon={<ImageRoundedIcon />}
-                className="option text-capitalize"
-                >Photo
+            <Button
+              onClick={() => imgRef.current.click()}
+              sx={{
+                backgroundColor: blue[600],
+                fontSize: "small",
+                marginBottom: "1rem",
+              }}
+              size="small"
+              variant="contained"
+              startIcon={<ImageRoundedIcon />}
+              className="option text-capitalize"
+            >
+              Photo
             </Button>
-            {/* <div>
-            <Typography
-              sx={{ color: purple[700], fontSize: "small" }}
-              className="option"
-            >
-              <PlayCircleFilledRoundedIcon />
-              Video
-            </Typography>
-          </div> */}
-            {/* <div>
-            <Typography
-              sx={{ color: purple[700], fontSize: "small" }}
-              className="option"
-            >
-              <LocationOnRoundedIcon />
-              Location
-            </Typography>
-          </div> */}
-            {/* <div>
-            <Typography
-              sx={{ color: purple[700], fontSize: "small" }}
-              className="option"
-            >
-              <CalendarMonthRoundedIcon />
-              Schedule 
-            </Typography>
-          </div> */}
-            {/* <div className="postOptions"></div> */}
             <Button
               variant="contained"
-              sx={{ textTransform: "capitalize", backgroundColor: blue[600]  }}
-              // color="secondary"
+              sx={{ textTransform: "capitalize", backgroundColor: blue[600] }}
               onClick={uploadPost}
               size="small"
-              // sx={{ backgroundColor: teal[700] }}
               className="btn btn-sm text-white"
             >
               Share
@@ -171,21 +160,27 @@ const PostShare = ({ getPosts }) => {
         <div style={{ display: "none" }}>
           <input
             name="myImg"
+            accept="image/x-png,image/gif,image/jpeg"
             onChange={
               (e) => onImgChange(e)
-              // (e)=>setFormData(e.target.files[0])
             }
             ref={imgRef}
             type="file"
           />
         </div>
         {img && (
-          <div className="previewImg">
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <CloseRoundedIcon
-              sx={{ cursor: "pointer" }}
+              sx={{
+                cursor: "pointer",
+                alignSelf: "self-end",
+                marginBottom: "0.2rem",
+              }}
               onClick={() => setImg(null)}
             />
-            <img src={img.image} alt="" />
+            <div className="previewImg">
+              <img src={img.image} alt="" />
+            </div>
           </div>
         )}
       </div>

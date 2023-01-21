@@ -1,9 +1,4 @@
 import React, { Fragment, useEffect, useState } from "react";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import Paper from "@mui/material/Paper";
 import adminAPI from "../../../APIs/AdminAPI";
@@ -20,7 +15,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from "@mui/material";
 import { toast } from "react-hot-toast";
 import { Verified } from "@mui/icons-material";
@@ -198,101 +192,6 @@ export const UsersList = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      {/* <List
-        dense
-        sx={{
-          width: "100%",
-          maxWidth: "auto",
-          bgcolor: "background.paper",
-          maxHeight: "100vh",
-        }}
-      >
-        {users.map((user) => {
-          // const labelId = `checkbox-list-secondary-label-${value}`;
-          return (
-            <ListItem
-              sx={{ padding: "0.2rem", borderRadius: "20px" }}
-              disablePadding
-            >
-              <ListItem sx={{ cursor: "default", gap: "1rem" }}>
-                <ListItemAvatar>
-                  <Avatar alt="" src={user.profilePic} />
-                </ListItemAvatar>
-                <ListItemText
-                  sx={{ maxWidth: "auto", minWidth: "200px" }}
-                  id={user.fullName}
-                  primary={
-                    <Typography sx={{ fontWeight: "400" }}>
-                      {user.fullName}
-                    </Typography>
-                  }
-                />
-                <ListItemText
-                  sx={{
-                    maxWidth: "350px",
-                    minWidth: "350px",
-                    justifyContent: "flex-start",
-                    display: "flex",
-                  }}
-                  id={user.email}
-                  primary={
-                    <Typography sx={{ fontWeight: "400" }}>
-                      {user.email}
-                    </Typography>
-                  }
-                />
-                {user.isActive ? (
-                  //   <ListItem sx={{minWidth:'100px'}}>
-                  <ListItemText
-                    sx={{ minWidth: "100px" }}
-                    onClick={() => handleClickOpen(user._id)}
-                    primary={
-                      <Button
-                        color="success"
-                        size="small"
-                        variant="contained"
-                        sx={{ color: "white", fontWeight: "400" }}
-                      >
-                        Block
-                      </Button>
-                    }
-                  />
-                ) : (
-                  <ListItemText
-                    sx={{ minWidth: "100px" }}
-                    onClick={() => handleClickOpen(user._id)}
-                    primary={
-                      <Button
-                        size="small"
-                        color="error"
-                        variant="contained"
-                        sx={{ fontWeight: "400" }}
-                      >
-                        Unblock
-                      </Button>
-                    }
-                  />
-                )}
-                {user.verificationRequest && (
-                  <ListItemText
-                    onClick={() => acceptVerificationRequest(user._id)}
-                    primary={
-                      <Button
-                        size="small"
-                        color="primary"
-                        variant="contained"
-                        sx={{ fontWeight: "400" }}
-                      >
-                        Accept verification request
-                      </Button>
-                    }
-                  />
-                )}
-              </ListItem>
-            </ListItem>
-          );
-        })}
-      </List> */}
       <Dialog
         open={open}
         onClose={handleClose}

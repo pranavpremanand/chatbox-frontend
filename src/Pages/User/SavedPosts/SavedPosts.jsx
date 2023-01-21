@@ -36,7 +36,7 @@ const SavedPosts = () => {
             overflow: "scroll",
             display: 'flex',
             flexWrap:'wrap',
-            justifyContent:'center'
+            justifyContent:'flex-start'
           }}
         >
           {savedPosts.map((post) => {

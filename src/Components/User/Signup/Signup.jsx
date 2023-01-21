@@ -14,10 +14,7 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { purple } from "@mui/material/colors";
 import { useNavigate } from "react-router-dom";
-import {
-  // Formik,
-  useFormik,
-} from "formik";
+import { useFormik } from "formik";
 import * as Yup from "yup";
 import { FormHelperText } from "@mui/material";
 import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
@@ -52,6 +49,7 @@ const initialValues = {
   password: "",
   confirmPassword: "",
 };
+
 const validationSchema = Yup.object({
   fullName: Yup.string()
     .required("This field is required")
@@ -90,7 +88,7 @@ export default function SignUp() {
   const [signUp, setSignUp] = React.useState(false);
   // const [otpError, setOtpError] = React.useState(false);
   const [otpField, setOtpField] = React.useState(false);
-  
+
   const formik = useFormik({
     initialValues,
     onSubmit: (values) => {
@@ -112,7 +110,7 @@ export default function SignUp() {
                 },
               });
               setOtpField(true);
-              setSignUp(true)
+              setSignUp(true);
               setOtp(response.data.response.otp);
             } else {
               toast(response.data.message, {
@@ -147,7 +145,7 @@ export default function SignUp() {
                     color: "#fff",
                   },
                 });
-              setOtpField(false);
+                setOtpField(false);
                 navigate("/login");
               } else if (
                 response.data.message === "Username already exist" ||

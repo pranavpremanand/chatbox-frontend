@@ -8,7 +8,6 @@ import {
   CssBaseline,
   Box,
   Typography,
-  // Avatar,
   TextField,
   Grid,
   Link,
@@ -19,10 +18,7 @@ import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { purple } from "@mui/material/colors";
 import * as Yup from "yup";
-import {
-  useFormik,
-  // Formik
-} from "formik";
+import { useFormik } from "formik";
 
 const initialValues = {
   usernameOrEmail: "",
@@ -67,7 +63,7 @@ function LoginAdmin() {
             }
           })
           .catch((err) => {
-            console.log("ERROR",err);
+            console.log("ERROR", err);
             toast("Something went wrong. Try again.", {
               icon: "❌",
               style: {
@@ -113,23 +109,11 @@ function LoginAdmin() {
         minHeight: "100vh",
       }}
     >
-      {/* <Formik
-        initialValues={{
-            usernameOrEmail: "",
-            password: "",
-          }} */}
-      {/* // validationSchema={SignupSchema}
-          onSubmit={(values) => {
-            // same shape as initial values
-            console.log(values);
-          }}
-          > */}
       <ThemeProvider theme={theme}>
         <Container component="main" maxWidth="xs" sx={{ maxHeight: "100vh" }}>
           <CssBaseline />
           <Box
             sx={{
-              // marginTop: 8,
               display: "flex",
               justifyContent: "center",
               flexDirection: "column",
@@ -194,7 +178,6 @@ function LoginAdmin() {
               <Button
                 variant="contained"
                 type="submit"
-                // variant="contained"
                 sx={{ mt: 2, mb: 2 }}
                 fullWidth
               >
@@ -204,18 +187,13 @@ function LoginAdmin() {
           </Box>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link
-                href="#"
-                onClick={() => navigate("/login")}
-                variant="body2"
-              >
+              <Link onClick={() => navigate("/login")} variant="body2">
                 User login here
               </Link>
             </Grid>
           </Grid>
         </Container>
       </ThemeProvider>
-      {/* </Formik> */}
     </div>
   );
 }
