@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const userAPI = axios.create({});
+const userAPI = axios.create({baseURL:process.env.REACT_APP_BASE_URL});
 
 userAPI.interceptors.request.use((req) => {
   // if (localStorage.getItem('userToken')) {
