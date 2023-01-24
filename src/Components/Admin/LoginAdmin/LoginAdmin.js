@@ -1,7 +1,6 @@
 import React from "react";
 import "./LoginAdmin.css";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-hot-toast";
 import {
   Container,
@@ -19,6 +18,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { purple } from "@mui/material/colors";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import adminBaseURL from "../../../APIs/AdminBaseAPI";
 
 const initialValues = {
   usernameOrEmail: "",
@@ -41,7 +41,7 @@ function LoginAdmin() {
     initialValues,
     onSubmit: (values) => {
       try {
-        axios({
+        adminBaseURL({
           url: "/admin/login",
           method: "post",
           data: values,

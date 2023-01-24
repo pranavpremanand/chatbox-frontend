@@ -142,41 +142,41 @@ function Login() {
   const formik = useFormik({
     initialValues,
     onSubmit: (values) => {
-      // login(values);
       try {
-        APIuser.post( "/user/login",values)
-        .then((response) => {
-            if (response.data.success) {
-              if (response.data.otpLoginSuccess) {
-                dispatch(changePassword(true))
-                setOtpField(false);
-              }
-              dispatch(user({ user: response.data.user }));
-              localStorage.setItem("userToken", response.data.accessToken);
-              localStorage.setItem("user", JSON.stringify(response.data.user));
-              navigate("/");
-            } else {
-              toast(response.data.message, {
-                icon: "⚠️",
-                style: {
-                  borderRadius: "10px",
-                  background: "#333",
-                  color: "#fff",
-                },
-              });
-            }
-          })
-          .catch((err) => {
-            console.log(err,'error');
-            toast("Something went wrong. Try again.", {
-              icon: "❌",
-              style: {
-                borderRadius: "10px",
-                background: "#333",
-                color: "#fff",
-              },
-            });
-          });
+        login(values);
+        // APIuser.post( "/user/login",values)
+        // .then((response) => {
+        //     if (response.data.success) {
+        //       if (response.data.otpLoginSuccess) {
+        //         dispatch(changePassword(true))
+        //         setOtpField(false);
+        //       }
+        //       dispatch(user({ user: response.data.user }));
+        //       localStorage.setItem("userToken", response.data.accessToken);
+        //       localStorage.setItem("user", JSON.stringify(response.data.user));
+        //       navigate("/");
+        //     } else {
+        //       toast(response.data.message, {
+        //         icon: "⚠️",
+        //         style: {
+        //           borderRadius: "10px",
+        //           background: "#333",
+        //           color: "#fff",
+        //         },
+        //       });
+        //     }
+        //   })
+        //   .catch((err) => {
+        //     console.log(err,'error');
+        //     toast("Something went wrong. Try again.", {
+        //       icon: "❌",
+        //       style: {
+        //         borderRadius: "10px",
+        //         background: "#333",
+        //         color: "#fff",
+        //       },
+        //     });
+        //   });
       } catch (err) {
         console.log("LOGIN ERROR", err);
       }
@@ -185,43 +185,43 @@ function Login() {
   });
 
   const login = (values) => {
-    // try {
-    //   axios.post( "/user/login",values)
-    //   .then((response) => {
-    //       if (response.data.success) {
-    //         if (response.data.otpLoginSuccess) {
-    //           dispatch(changePassword(true))
-    //           setOtpField(false);
-    //         }
-    //         dispatch(user({ user: response.data.user }));
-    //         localStorage.setItem("userToken", response.data.accessToken);
-    //         localStorage.setItem("user", JSON.stringify(response.data.user));
-    //         navigate("/");
-    //       } else {
-    //         toast(response.data.message, {
-    //           icon: "⚠️",
-    //           style: {
-    //             borderRadius: "10px",
-    //             background: "#333",
-    //             color: "#fff",
-    //           },
-    //         });
-    //       }
-    //     })
-    //     .catch((err) => {
-    //       console.log(err,'error');
-    //       toast("Something went wrong. Try again.", {
-    //         icon: "❌",
-    //         style: {
-    //           borderRadius: "10px",
-    //           background: "#333",
-    //           color: "#fff",
-    //         },
-    //       });
-    //     });
-    // } catch (err) {
-    //   console.log("LOGIN ERROR", err);
-    // }
+    try {
+      APIuser.post( "/user/login",values)
+      .then((response) => {
+          if (response.data.success) {
+            if (response.data.otpLoginSuccess) {
+              dispatch(changePassword(true))
+              setOtpField(false);
+            }
+            dispatch(user({ user: response.data.user }));
+            localStorage.setItem("userToken", response.data.accessToken);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+            navigate("/");
+          } else {
+            toast(response.data.message, {
+              icon: "⚠️",
+              style: {
+                borderRadius: "10px",
+                background: "#333",
+                color: "#fff",
+              },
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err,'error');
+          toast("Something went wrong. Try again.", {
+            icon: "❌",
+            style: {
+              borderRadius: "10px",
+              background: "#333",
+              color: "#fff",
+            },
+          });
+        });
+    } catch (err) {
+      console.log("LOGIN ERROR", err);
+    }
   };
   const navigate = useNavigate();
   const theme = createTheme({
