@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import "./PostShare.css";
 import ImageRoundedIcon from "@mui/icons-material/ImageRounded";
 import { blue } from "@mui/material/colors";
@@ -7,6 +7,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import axios from "../../../../../APIs/UserAuthAPI";
 import Axios from "axios";
 import { toast } from "react-hot-toast";
+import { LoadingContext } from "../../../../Context";
 
 const PostShare = ({ getPosts }) => {
   const [img, setImg] = useState("");
@@ -14,6 +15,7 @@ const PostShare = ({ getPosts }) => {
   const [postData, setPostData] = useState({ image: "", description: "" });
   const userInfo = JSON.parse(localStorage.getItem("user"));
   const imgRef = useRef();
+  const { setIsLoading } = useContext(LoadingContext);
 
   const onImgChange = (file) => {
     const fData = new FormData();
@@ -47,6 +49,7 @@ const PostShare = ({ getPosts }) => {
   const uploadPost = async () => {
     let image;
     if (img) {
+      setIsLoading(true);
       const response = await Axios.post(
         "https://api.cloudinary.com/v1_1/dxlmn8skp/image/upload",
         formData
@@ -69,8 +72,9 @@ const PostShare = ({ getPosts }) => {
           getPosts();
           setImg(null);
           setPostData({ description: "" });
+          setIsLoading(false);
         })
-        .catch((err) =>
+        .catch((err) => {
           toast("Something went wrong, try again", {
             icon: "❌",
             style: {
@@ -78,8 +82,9 @@ const PostShare = ({ getPosts }) => {
               background: "#333",
               color: "#fff",
             },
-          })
-        );
+          });
+          setIsLoading(false);
+        });
     } else {
       toast("Select a picture to post", {
         icon: "❌",
@@ -161,9 +166,7 @@ const PostShare = ({ getPosts }) => {
           <input
             name="myImg"
             accept="image/x-png,image/gif,image/jpeg"
-            onChange={
-              (e) => onImgChange(e)
-            }
+            onChange={(e) => onImgChange(e)}
             ref={imgRef}
             type="file"
           />

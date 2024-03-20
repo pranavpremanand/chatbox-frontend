@@ -1,7 +1,12 @@
-.postSide{
-    display: flex;
-    flex-direction: column;
-    gap:1rem;
-    height: 100vh;
-    overflow: auto;
+.postSide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100vh;
+  overflow: auto;
+}
+@media (max-width: 1079px) {
+  .postSide {
+    width: 100%;
+  }
 }

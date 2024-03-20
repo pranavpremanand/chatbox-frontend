@@ -7,7 +7,7 @@ import Options from "../../../Common/Options/Options";
 
 const LeftSide = () => {
   return (
-    <div className="profileSide" style={{ minHeight: "100vh" }}>
+    <div className="options-side" style={{ minHeight: "100vh" }}>
       <LogoSide />
       <Options/>
       {/* <ProfileCard /> */}

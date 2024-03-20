@@ -1,13 +1,21 @@
-.Notifications-Page{
-    position: relative;
-    display: grid;
-    /* grid-template-columns: 19rem auto 20rem; */
-    grid-template-columns: 15rem auto 21rem;
-    gap: 1rem;
+.Notifications-Page {
+  position: relative;
+  display: grid;
+  /* grid-template-columns: 19rem auto 20rem; */
+  grid-template-columns: 15rem auto 21rem;
+  gap: 1rem;
 }
-.LeftSide{
-    height: 100vh;
+@media (max-width: 1079px) {
+  .Notifications-Page {
+    display: flex;
+  }
+  .Notifications {
+    width: 100%;
+  }
 }
-.Notifications{
-    margin-top: 20px;
+.LeftSide {
+  height: 100vh;
+}
+.Notifications {
+  margin-top: 20px;
 }

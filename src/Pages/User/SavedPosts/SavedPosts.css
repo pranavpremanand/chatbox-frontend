@@ -1,13 +1,21 @@
-.Main{
-    position: relative;
-    display: grid;
-    grid-template-columns: 15rem auto 21rem;
-    gap: 1rem;
+.Main {
+  position: relative;
+  display: grid;
+  grid-template-columns: 15rem auto 21rem;
+  gap: 1rem;
 }
-.savedPosts{
-    height: 100vh;
+.savedPosts {
+  height: 100vh;
 }
-.leftSide{
+@media (max-width: 1079px) {
+  .Main {
     display: flex;
-    justify-content: center;
+  }
+  .savedPosts {
+    width: 100%;
+  }
+}
+.leftSide {
+  display: flex;
+  justify-content: center;
 }

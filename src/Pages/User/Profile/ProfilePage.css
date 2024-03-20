@@ -1,13 +1,23 @@
-.Main{
-    position: relative;
-    display: grid;
-    grid-template-columns: 15rem auto 21rem;
-    gap: 1rem;
+.Main {
+  position: relative;
+  display: grid;
+  grid-template-columns: 15rem auto 21rem;
+  gap: 1rem;
 }
-.profileSide{
-    height: 100vh;
+@media (max-width: 1079px) {
+  .Main {
+    display: flex !important;
+  }
+  .profileSide {
+    width: 100%;
+  }
 }
-.leftSide{
-    display: flex;
-    justify-content: center;
+
+.profileSide {
+  height: 100vh;
+  overflow-y: scroll;
+}
+.leftSide {
+  display: flex;
+  justify-content: center;
 }

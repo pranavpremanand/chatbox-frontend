@@ -81,7 +81,7 @@ function Home() {
           posts: response.data.posts,
         })
       );
-      dispatch(setSavedPosts(response.data.savedPosts.savedPosts))
+      dispatch(setSavedPosts(response.data.savedPosts.savedPosts));
       dispatch(user({ user: response.data.user }));
     } catch (err) {
       console.log(err);

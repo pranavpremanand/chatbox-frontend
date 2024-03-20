@@ -29,7 +29,7 @@ import {
 import { changePassword, user } from "../../../Redux/UserSlice";
 import { useDispatch } from "react-redux";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
-import APIuser from "../../../APIs/userAPI";
+import { APIuser } from "../../../APIs/UserAPI";
 
 const style = {
   position: "absolute",
@@ -153,11 +153,11 @@ function Login() {
 
   const login = (values) => {
     try {
-      APIuser.post( "/user/login",values)
-      .then((response) => {
+      APIuser.post("/user/login", values)
+        .then((response) => {
           if (response.data.success) {
             if (response.data.otpLoginSuccess) {
-              dispatch(changePassword(true))
+              dispatch(changePassword(true));
               setOtpField(false);
             }
             dispatch(user({ user: response.data.user }));
@@ -176,7 +176,7 @@ function Login() {
           }
         })
         .catch((err) => {
-          console.log(err,'error');
+          console.log(err, "error");
           toast("Something went wrong. Try again.", {
             icon: "❌",
             style: {

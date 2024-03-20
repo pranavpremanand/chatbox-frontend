@@ -19,7 +19,7 @@ const Chat = () => {
   const [sendMessage, setSendMessage] = useState(null);
   const [receiveMessage, setReceiveMessage] = useState(null);
   // const socket = useRef();
-  const socket = io.connect('https://chatbox.playonsports.shop')
+  const socket = io.connect('https://chatbox-backend.vercel.app')
   // const socket = io.connect('http://localhost:5000')
   //   socket.current = io("http://localhost:8800");
 
@@ -90,7 +90,7 @@ useEffect(()=>{
     return online ? true : false;
   };
   return (
-    <div className="Home">
+    <div className="Home chat_main">
       <div className="leftSide">
         <LeftSide />
       </div>

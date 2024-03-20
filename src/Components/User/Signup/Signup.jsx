@@ -93,15 +93,51 @@ export default function SignUp() {
     initialValues,
     onSubmit: (values) => {
       try {
-        if (otp === "") {
-          axios({
-            url: "/user/send-otp",
-            method: "post",
-            data: values,
-          }).then((response) => {
-            console.log(response.data);
-            if (response.data.message === "OTP sent") {
-              toast("OTP sent to your email", {
+        // if (otp === "") {
+        //   axios({
+        //     url: "/user/send-otp",
+        //     method: "post",
+        //     data: values,
+        //   }).then((response) => {
+        //     console.log(response.data);
+        //     if (response.data.message === "OTP sent") {
+        //       toast("OTP sent to your email", {
+        //         icon: "✅",
+        //         style: {
+        //           borderRadius: "10px",
+        //           background: "#333",
+        //           color: "#fff",
+        //         },
+        //       });
+        //       setOtpField(true);
+        //       setSignUp(true);
+        //       setOtp(response.data.response.otp);
+        //     } else {
+        //       toast(response.data.message, {
+        //         icon: "❌",
+        //         style: {
+        //           borderRadius: "10px",
+        //           background: "#333",
+        //           color: "#fff",
+        //         },
+        //       });
+        //     }
+        //   });
+        // } else if (otp !== "" && !signUp) {
+        //   toast("OTP already has been sent", {
+        //     icon: "⚠️",
+        //     style: {
+        //       borderRadius: "10px",
+        //       background: "#333",
+        //       color: "#fff",
+        //     },
+        //   });
+        // } else if (otp === values.otp) {
+        axios
+          .post("/user/signup", values)
+          .then((response) => {
+            if (response.data.message === "Account created successfully.") {
+              toast(response.data.message, {
                 icon: "✅",
                 style: {
                   borderRadius: "10px",
@@ -109,9 +145,21 @@ export default function SignUp() {
                   color: "#fff",
                 },
               });
-              setOtpField(true);
-              setSignUp(true);
-              setOtp(response.data.response.otp);
+              setOtpField(false);
+              navigate("/login");
+            } else if (
+              response.data.message === "Username already exist" ||
+              "Email already exist"
+            ) {
+              toast(response.data.message, {
+                // icon: "❗",
+                icon: "⚠️",
+                style: {
+                  borderRadius: "10px",
+                  background: "#333",
+                  color: "#fff",
+                },
+              });
             } else {
               toast(response.data.message, {
                 icon: "❌",
@@ -122,68 +170,28 @@ export default function SignUp() {
                 },
               });
             }
-          });
-        } else if (otp !== "" && !signUp) {
-          toast("OTP already has been sent", {
-            icon: "⚠️",
-            style: {
-              borderRadius: "10px",
-              background: "#333",
-              color: "#fff",
-            },
-          });
-        } else if (otp === values.otp) {
-          axios
-            .post("/user/signup", values)
-            .then((response) => {
-              if (response.data.message === "Account created successfully.") {
-                toast(response.data.message, {
-                  icon: "✅",
-                  style: {
-                    borderRadius: "10px",
-                    background: "#333",
-                    color: "#fff",
-                  },
-                });
-                setOtpField(false);
-                navigate("/login");
-              } else if (
-                response.data.message === "Username already exist" ||
-                "Email already exist"
-              ) {
-                toast(response.data.message, {
-                  // icon: "❗",
-                  icon: "⚠️",
-                  style: {
-                    borderRadius: "10px",
-                    background: "#333",
-                    color: "#fff",
-                  },
-                });
-              } else {
-                toast(response.data.message, {
-                  icon: "❌",
-                  style: {
-                    borderRadius: "10px",
-                    background: "#333",
-                    color: "#fff",
-                  },
-                });
-              }
-            })
-            .catch((err) => {
-              console.log(err, "ERROR");
+          })
+          .catch((err) => {
+            toast(err.message, {
+              icon: "❌",
+              style: {
+                borderRadius: "10px",
+                background: "#333",
+                color: "#fff",
+              },
             });
-        } else {
-          toast("Entered OTP is incorrect", {
-            icon: "❌",
-            style: {
-              borderRadius: "10px",
-              background: "#333",
-              color: "#fff",
-            },
+            console.log(err, "ERROR");
           });
-        }
+        // } else {
+        //   toast("Entered OTP is incorrect", {
+        //     icon: "❌",
+        //     style: {
+        //       borderRadius: "10px",
+        //       background: "#333",
+        //       color: "#fff",
+        //     },
+        //   });
+        // }
       } catch (err) {
         toast("Something went wrong. Try again.", {
           icon: "❌",
@@ -325,43 +333,51 @@ export default function SignUp() {
                   {formik.errors.confirmPassword}
                 </FormHelperText>
               ) : null}
-              {otpField ? (
-                <TextField
-                  name="otp"
-                  size="small"
-                  // value={OTPcheck}
-                  sx={{ marginTop: 1 }}
-                  // value={otp}
-                  // onChange={(event) => {setOTPCheck(event.target.value)}}
-                  value={formik.values.otp}
-                  onChange={formik.handleChange}
-                  type="text"
-                  id="otp"
-                  variant="outlined"
-                  label="Enter OTP sent to your email"
-                  fullWidth
-                  placeholder="OTP"
-                />
-              ) : null}
-              {otpField ? (
-                <Button
-                  variant="contained"
-                  type="submit"
-                  sx={{ mt: 2, mb: 2 }}
-                  fullWidth
-                >
-                  Enter OTP and Signup
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  type="submit"
-                  sx={{ mt: 2, mb: 2 }}
-                  fullWidth
-                >
-                  Continue to Verify Email
-                </Button>
-              )}
+              {/* {otpField ? (
+                  <TextField
+                    name="otp"
+                    size="small"
+                    // value={OTPcheck}
+                    sx={{ marginTop: 1 }}
+                    // value={otp}
+                    // onChange={(event) => {setOTPCheck(event.target.value)}}
+                    value={formik.values.otp}
+                    onChange={formik.handleChange}
+                    type="text"
+                    id="otp"
+                    variant="outlined"
+                    label="Enter OTP sent to your email"
+                    fullWidth
+                    placeholder="OTP"
+                  />
+                ) : null}
+                {otpField ? (
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    sx={{ mt: 2, mb: 2 }}
+                    fullWidth
+                  >
+                    Enter OTP and Signup
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    sx={{ mt: 2, mb: 2 }}
+                    fullWidth
+                  >
+                    Continue to Verify Email
+                  </Button>
+                )} */}
+              <Button
+                variant="contained"
+                type="submit"
+                sx={{ mt: 2, mb: 2 }}
+                fullWidth
+              >
+                Signup
+              </Button>
             </Box>
           </Box>
           <Grid container justifyContent="flex-end">

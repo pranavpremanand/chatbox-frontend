@@ -1,7 +1,8 @@
 import axios from "axios";
 
 // const userAPI = axios.create({baseURL:'http://localhost:5000'});
-const userAPI = axios.create({baseURL:'https://chatbox.playonsports.shop'});
+const userAPI = axios.create({baseURL:'https://chatbox-backend.vercel.app'});
+// const userAPI = axios.create({baseURL:'https://chatbox.playonsports.shop'});
 // const userAPI = axios.create({baseURL:process.env.REACT_APP_BASE_URL});
 // 
 userAPI.interceptors.request.use((req) => {

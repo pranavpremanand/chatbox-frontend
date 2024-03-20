@@ -1,9 +1,5 @@
-import { Fragment } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { Fragment, useContext } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import AdminLogin from "./Pages/Admin/AdminLogin";
 import Home from "./Pages/User/Home/Home";
@@ -21,13 +17,18 @@ import Notifications from "./Pages/User/Notifications/Notifications";
 import UsersSide from "./Pages/Admin/UsersSide";
 import ReportedPosts from "./Pages/Admin/ReportedList";
 import SavedPosts from "./Pages/User/SavedPosts/SavedPosts";
+import { LoadingContext } from "./Components/Context";
+import { Spinner } from "./Components/Spinner";
+import MobileOptions from "./Components/Common/MobileOptions/MobileOptions";
 // import { io } from "socket.io-client";
 //   const socket = {}
 //   socket.current = io("http://localhost:8800");
 
 function App() {
+  const { isLoading } = useContext(LoadingContext);
   return (
     <Fragment>
+      {isLoading && <Spinner />}
       <Box className="App">
         {/* <RouterProvider router={router} /> */}
         <Router>
@@ -39,6 +40,7 @@ function App() {
                 <UserProtectedRoute>
                   {/* <CheckBlocked> */}
                   <Home />
+                  <MobileOptions />
                   {/* </CheckBlocked> */}
                 </UserProtectedRoute>
               }
@@ -48,6 +50,7 @@ function App() {
               element={
                 <UserProtectedRoute>
                   <ProfilePage />
+                  <MobileOptions />
                 </UserProtectedRoute>
               }
             />
@@ -56,6 +59,7 @@ function App() {
               element={
                 <UserProtectedRoute>
                   <Chat />
+                  <MobileOptions />
                 </UserProtectedRoute>
               }
             />
@@ -64,6 +68,7 @@ function App() {
               element={
                 <UserProtectedRoute>
                   <Notifications />
+                  <MobileOptions />
                 </UserProtectedRoute>
               }
             />
@@ -72,6 +77,7 @@ function App() {
               element={
                 <UserProtectedRoute>
                   <SavedPosts />
+                  <MobileOptions />
                 </UserProtectedRoute>
               }
             />

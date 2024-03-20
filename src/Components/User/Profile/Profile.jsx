@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import userAPI from "../../../APIs/UserAuthAPI";
 import Axios from "axios";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useEffect, useRef } from "react";
 import "./Profile.css";
 import Post from "../Home/PostSide/Posts/Post";
@@ -22,6 +22,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { toast } from "react-hot-toast";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { blue } from "@mui/material/colors";
+import { LoadingContext } from "../../Context";
 
 function Profile() {
   const loggedUserStatus = useSelector((state) => state.profileViewUser.user);
@@ -46,12 +47,14 @@ function Profile() {
   const allPhotos = useSelector((state) => state.photos.photos);
   const [posts, setPosts] = useState([]);
   const [editOption, setEditOption] = useState(false);
+  const{setIsLoading} = useContext(LoadingContext)
 
   const onProfileChange = async (file) => {
     const data = new FormData();
     const profilePic = file.target.files[0];
     data.append("file", profilePic);
     data.append("upload_preset", "aiaeajln");
+    setIsLoading(true)
     const response = await Axios.post(
       "https://api.cloudinary.com/v1_1/dxlmn8skp/image/upload",
       data
@@ -75,8 +78,10 @@ function Profile() {
             });
             getPosts(currentUser._id);
           }
+          setIsLoading(false)
         })
         .catch((err) => {
+          setIsLoading(false)
           toast("Something went wrong, try again", {
             icon: "❌",
             style: {
@@ -97,10 +102,12 @@ function Profile() {
     const coverPic = file.target.files[0];
     data.append("file", coverPic);
     data.append("upload_preset", "aiaeajln");
+    setIsLoading(true)
     const response = await Axios.post(
       "https://api.cloudinary.com/v1_1/dxlmn8skp/image/upload",
       data
     );
+
     if (response.data) {
       await userAPI
         .post("/user/add-cover", { cover: response.data.secure_url })
@@ -116,6 +123,7 @@ function Profile() {
             });
             getPosts(currentUser._id);
           }
+          setIsLoading(false)
         })
         .catch((err) => {
           toast("Something went wrong, try again", {
@@ -127,6 +135,7 @@ function Profile() {
             },
           });
           console.log(err);
+          setIsLoading(false)
         });
     }
   };
@@ -317,7 +326,8 @@ function Profile() {
             {userData.about ? userData.about : "Not added"}
           </Typography>
         </div>
-        {userData.followers?.length >= 5 &&
+        {
+        // userData.followers?.length >= 5 &&
           !userData.verifiedUser &&
           !userData.verificationRequest &&
           currentUser._id === userData._id && (
@@ -344,7 +354,7 @@ function Profile() {
                     alignSelf: "center",
                   }}
                 >
-                  You can now request to make your account to be verified.
+                  You can request to make your account to be verified.
                 </Typography>
               </Box>
               <Button
@@ -363,14 +373,14 @@ function Profile() {
           <div>
             <div className="follow">
               <Typography sx={{ fontWeight: "800" }}>
-                {userData.following ? userData.following.length-1 : 0}
+                {userData.following ? userData.following.length : 0}
               </Typography>
               <Typography sx={{ fontWeight: "500" }}>Following</Typography>
             </div>
             <div className="vl"></div>
             <div className="follow">
               <Typography sx={{ fontWeight: "800" }}>
-                {userData.followers ? userData.followers.length-1 : 0}
+                {userData.followers ? userData.followers.length : 0}
               </Typography>
               <Typography sx={{ fontWeight: "500" }}>Followers</Typography>
             </div>

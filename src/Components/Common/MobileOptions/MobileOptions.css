@@ -1,0 +1,18 @@
+.mobileOptions {
+  background: #f0ecec;
+  padding-block: 1rem;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+}
+@media (min-width: 1079px) {
+  .mobileOptions {
+    display: none;
+  }
+}
+
+.option-icon:hover {
+  color: #408dff;
+}
